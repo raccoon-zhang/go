@@ -24,23 +24,11 @@ func handleGetName(c *gin.Context) {
 }
 
 func main() {
-	db, err := sql.Open("mysql", "root:@/school")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	ret, err := db.Query("select * from student")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	print(ret)
 	engine := gin.Default()
 	engine.Use(func(c *gin.Context) {
 		fmt.Println("middle1")
 		c.Next()
 	})
 	engine.GET("/:name", handleGetName)
-	// engine.Run(":8080")
+	engine.Run(":8080")
 }
