@@ -20,10 +20,6 @@ func init() {
 	}
 }
 
-func deinit() {
-	pool.DestroyPool()
-}
-
 type student struct {
 	name string
 	age  int
@@ -67,4 +63,5 @@ func main() {
 	engine.Use(loginCheck)
 	engine.GET("/:name", handleGetName)
 	engine.Run(":8080")
+	pool.DestroyPool()
 }

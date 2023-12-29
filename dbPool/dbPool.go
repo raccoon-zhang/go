@@ -31,19 +31,14 @@ func InitPool(driver, dsn string, size int) (*Pool,error) {
 }
 
 func (pool Pool) NewDb() (db *sql.DB, err error) {
-	var ok bool = false
 	pool.freePool.Range(func (key ,value any)bool {
 		if db == nil {
-		v,ok := value.(*sql.DB)
-		if ok {
-			db = v
-			ok = true
-			return false
-		}
+		db,_ = value.(*sql.DB)
+		return false
 		}
 		return true
 	})	
-	if ok {
+	if db!= nil {
 		pool.freePool.Delete(db)
 		pool.busyPool.Store(db, db)
 		return db, nil
