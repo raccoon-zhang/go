@@ -1,0 +1,81 @@
+package dbPool
+
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+	"sync"
+
+	_ "github.com/go-sql-driver/mysql"
+)
+
+type Pool struct {
+	busyPool    sync.Map
+	freePool    sync.Map
+	isDestroyed bool
+}
+
+func InitPool(driver, dsn string, size int) (*Pool,error) {
+	var pool = &Pool{}
+	for count := 0; count < size; count++ {
+		db, err := sql.Open(driver, dsn)
+		if err != nil {
+			fmt.Println(err)
+			//清除所有的已经插入的数据
+			pool.freePool = sync.Map{}
+			return nil,errors.New("create error")
+		}
+		pool.freePool.Store(db, db)
+	}
+	return pool,nil
+}
+
+func (pool Pool) NewDb() (db *sql.DB, err error) {
+	var ok bool = false
+	pool.freePool.Range(func (key ,value any)bool {
+		if db == nil {
+		v,ok := value.(*sql.DB)
+		if ok {
+			db = v
+			ok = true
+			return false
+		}
+		}
+		return true
+	})	
+	if ok {
+		pool.freePool.Delete(db)
+		pool.busyPool.Store(db, db)
+		return db, nil
+	} else {
+		return nil, errors.New("no db is free")
+	}
+}
+func (pool Pool) DeleteDb(db *sql.DB) {
+	if pool.isDestroyed {
+		db.Close()
+		return
+	}
+	pool.busyPool.Delete(db)
+	pool.freePool.Store(db, db)
+}
+
+func (pool Pool) DestroyPool() {
+	pool.busyPool.Range(func(key, value any) bool {
+		db, ok := value.(*sql.DB)
+		if ok {
+		db.Close()
+		}
+		pool.busyPool.Delete(key)
+		return true
+	})
+	pool.freePool.Range(func(key, value any) bool {
+		db,ok := value.(*sql.DB)
+		if ok {
+		db.Close()
+		}
+		pool.freePool.Delete(key)
+		return true
+	})
+	pool.isDestroyed = true
+}

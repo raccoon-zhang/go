@@ -1,24 +1,27 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"local/dbPool"
 )
 
-var dbPool = make([]*sql.DB, 0)
+var pool *dbPool.Pool
 
 func init() {
-	fmt.Println("pool init")
-	db, err := sql.Open("mysql", "root:@/school")
+	var err error
+	pool,err = dbPool.InitPool("mysql", "root:@/school", 10)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
-	dbPool = append(dbPool, db)
+}
+
+func deinit() {
+	pool.DestroyPool()
 }
 
 type student struct {
@@ -34,12 +37,13 @@ func handleGetName(c *gin.Context) {
 
 func loginCheck(c *gin.Context) {
 	var name = c.Param("name")
-	var db = dbPool[len(dbPool)-1]
-	if db == nil {
+	db,err := pool.NewDb()
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 	var sqlString = "select * from student where name = ?"
-	var ret, err = db.Query(sqlString, name)
+	ret, err := db.Query(sqlString, name)
 	if err != nil {
 		fmt.Println(err)
 		return
