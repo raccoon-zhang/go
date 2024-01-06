@@ -8,6 +8,7 @@ import (
 
 func main() {
 	engine := gin.Default()
+	engine.LoadHTMLGlob("../templates/*")
 	ginweb.InitGroup(engine)
 	engine.Run(":8080")
 }

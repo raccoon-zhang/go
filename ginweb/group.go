@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"local/dbPool"
 	"local/tools"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,30 +21,35 @@ func init() {
 	}
 }
 
-type student struct {
-	name string
-	age  int
-}
-
 func handleGetName(c *gin.Context) {
-	var name = c.Param("name")
-	var password = c.Param("password")
+	var name = c.PostForm("name")
+	var password = c.PostForm("password")
 	fmt.Println("name: ", name)
 	fmt.Println("password: ", password)
-	return
 }
 
 func loginCheck(c *gin.Context) {
-	var name = c.Param("name")
-	var password = c.Param("password")
+	var name string
+	var password string
+	if c.Request.Method == http.MethodGet {
+		name = c.Param("name")
+		password = c.Param("password")
+	} else if c.Request.Method == http.MethodPost {
+		name = c.PostForm("name")
+		password = c.PostForm("password")
+	}
+
 	var isPass = false
 
 	defer func() {
 		if isPass {
 			fmt.Println("pass")
+			c.JSON(http.StatusOK, gin.H{"status": "true"})
 			c.Next()
 		} else {
 			fmt.Println("noPass")
+			c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
+			c.Abort()
 		}
 	}()
 
@@ -69,16 +75,16 @@ func loginCheck(c *gin.Context) {
 		ret.Scan(&name, &age, &passwordHash)
 		if tools.PasswordDecrypt(passwordHash, password) {
 			isPass = true
-			c.Next()
 		}
 	}
-	return
 }
 
 func setLogInGroup(engine *gin.Engine) {
 	loginGroup := engine.Group(loginPath)
-	loginGroup.Use(loginCheck)
-	loginGroup.GET("/:name/:password", handleGetName)
+	loginGroup.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", "")
+	})
+	loginGroup.POST("/check", loginCheck, handleGetName)
 }
 
 func InitGroup(engine *gin.Engine) {
