@@ -6,6 +6,7 @@ import (
 	"local/tools"
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,6 +27,17 @@ func handleGetName(c *gin.Context) {
 	var password = c.PostForm("password")
 	fmt.Println("name: ", name)
 	fmt.Println("password: ", password)
+}
+
+func sessionCheck(c *gin.Context) {
+	id := sessions.Default(c).Get("userId")
+	if id == nil {
+		fmt.Println("you have not login")
+		c.Redirect(http.StatusTemporaryRedirect, "/login")
+	} else {
+		fmt.Println(id)
+		fmt.Println("yong have login")
+	}
 }
 
 func loginCheck(c *gin.Context) {
@@ -62,19 +74,22 @@ func loginCheck(c *gin.Context) {
 		pool.DeleteDb(db)
 	}()
 
-	var sqlString = "select * from student where name = ?"
+	var sqlString = "select id,name,password from student where name = ?"
 	ret, err := db.Query(sqlString, name)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	for ret.Next() {
+		var id int
 		var name string
-		var age int
 		var passwordHash string
-		ret.Scan(&name, &age, &passwordHash)
+		ret.Scan(&id, &name, &passwordHash)
 		if tools.PasswordDecrypt(passwordHash, password) {
 			isPass = true
+			session := sessions.Default(c)
+			session.Set("userId", id)
+			session.Save()
 		}
 	}
 }
@@ -84,9 +99,13 @@ func setLogInGroup(engine *gin.Engine) {
 	loginGroup.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", "")
 	})
-	loginGroup.POST("/check", loginCheck, handleGetName)
+	loginGroup.POST("/", loginCheck, handleGetName)
 }
 
 func InitGroup(engine *gin.Engine) {
 	setLogInGroup(engine)
+	engine.Use(sessionCheck)
+	engine.GET("/check", func(c *gin.Context) {
+
+	})
 }
