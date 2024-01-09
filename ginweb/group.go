@@ -22,6 +22,14 @@ func init() {
 	}
 }
 
+func savePrePage(c *gin.Context) {
+	//其他的中间件执行完毕之后再更新当前页面，否则不更新
+	c.Next()
+	session := sessions.Default(c)
+	session.Set("prepage", c.Request.URL.Path)
+	session.Save()
+	fmt.Println("save prepage:", c.Request.URL.Path)
+}
 func handleGetName(c *gin.Context) {
 	var name = c.PostForm("name")
 	var password = c.PostForm("password")
@@ -29,11 +37,17 @@ func handleGetName(c *gin.Context) {
 	fmt.Println("password: ", password)
 }
 
+func mustLogin(c *gin.Context) {
+	id := sessions.Default(c).Get("userKey")
+	if id == nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+}
+
 func sessionCheck(c *gin.Context) {
-	id := sessions.Default(c).Get("userId")
+	id := sessions.Default(c).Get("userKey")
 	if id == nil {
 		fmt.Println("you have not login")
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
 	} else {
 		fmt.Println(id)
 		fmt.Println("yong have login")
@@ -52,6 +66,11 @@ func loginCheck(c *gin.Context) {
 	}
 
 	var isPass = false
+	db, err := pool.NewDb()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	defer func() {
 		if isPass {
@@ -63,49 +82,72 @@ func loginCheck(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
 			c.Abort()
 		}
-	}()
-
-	db, err := pool.NewDb()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer func() {
 		pool.DeleteDb(db)
 	}()
 
-	var sqlString = "select id,name,password from student where name = ?"
+	var sqlString = "select name,password from student where name = ?"
 	ret, err := db.Query(sqlString, name)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	for ret.Next() {
-		var id int
 		var name string
 		var passwordHash string
-		ret.Scan(&id, &name, &passwordHash)
+		ret.Scan(&name, &passwordHash)
 		if tools.PasswordDecrypt(passwordHash, password) {
 			isPass = true
 			session := sessions.Default(c)
-			session.Set("userId", id)
+			session.Set("userKey", name)
 			session.Save()
 		}
 	}
 }
 
+func getPrePageUrl(c *gin.Context) string {
+	var url, ok = sessions.Default(c).Get("prepage").(string)
+	if !ok {
+		url = "/"
+	}
+	return url
+}
+
+// 给前端用的，至于延迟多少时间前端自己设置，后端不处理
+func backPage(c *gin.Context) {
+	var url = getPrePageUrl(c)
+	c.JSON(http.StatusOK, gin.H{"prepage": url})
+}
+
+func multiLoginCheck(c *gin.Context) {
+	id := sessions.Default(c).Get("userKey")
+	if id != nil {
+		var url = getPrePageUrl(c)
+		fmt.Println("no need to login multiptly ,redirect to", url)
+		c.Redirect(http.StatusTemporaryRedirect, url)
+		c.Abort()
+	}
+}
+
 func setLogInGroup(engine *gin.Engine) {
 	loginGroup := engine.Group(loginPath)
-	loginGroup.GET("/", func(c *gin.Context) {
+	loginGroup.GET("/", multiLoginCheck, func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", "")
 	})
 	loginGroup.POST("/", loginCheck, handleGetName)
 }
 
-func InitGroup(engine *gin.Engine) {
-	setLogInGroup(engine)
+func InitRouter(engine *gin.Engine) {
+	//保存之前访问的页面，用于重复登陆返回页面,这里要先检查是否登陆在保存页面
 	engine.Use(sessionCheck)
-	engine.GET("/check", func(c *gin.Context) {
+	//login界面和跳转界面不用保存，总不能登陆之后再跳回login或者跳转界面，会死循环
+	setLogInGroup(engine)
+	engine.GET("/backPage", backPage)
+	//保存界面
+	engine.Use(savePrePage)
+	engine.GET("/", func(c *gin.Context) {
+		fmt.Println("hello world")
+	})
+	engine.GET("/check", mustLogin, func(c *gin.Context) {
 
 	})
 }

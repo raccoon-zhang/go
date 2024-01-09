@@ -119,6 +119,13 @@
         formData.append("name", name);
         formData.append("password", password);
 
+        fetch("/backPage", {
+          method:"GET"
+        }).then(function(response) {
+          response.json().then(function(data) {
+            var prepage = data["prepage"]
+          })
+        })
     
         // 发送请求到后端
         // 可以使用fetch、XMLHttpRequest等方法发送请求
@@ -133,8 +140,27 @@
             var item = document.getElementById("login_result")
             item.hidden = false
             if (data.status == "true") {
-              item.innerText = "登录成功"
               console.log("success")
+              item.innerText = "登录成功, 3s后返回登陆前页面"
+              var remainTime = 3
+
+              fetch("/backPage", {
+                method:"GET"
+              }).then(function(response) {
+                response.json().then(function(data) {
+                  var prepage = data["prepage"]
+                  function updateRemainTime() {
+                    item.innerText = "登陆成功," + remainTime +"秒后返回登陆前页面"
+                    remainTime--
+                    if (remainTime > 0) {
+                      setTimeout(updateRemainTime, 1000)
+                    } else {
+                      window.location.href = prepage
+                    }
+                  }
+                  updateRemainTime()
+                })
+              })
             } else {
               item.innerText = "用户名或者密码不正确"
               console.log("false")

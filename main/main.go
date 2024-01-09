@@ -15,6 +15,6 @@ func main() {
 	engine.Use(sessions.Sessions("user_id", store))
 
 	engine.LoadHTMLGlob("../templates/*")
-	ginweb.InitGroup(engine)
+	ginweb.InitRouter(engine)
 	engine.Run(":8080")
 }
