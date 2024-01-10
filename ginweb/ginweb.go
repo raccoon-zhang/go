@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 )
 
@@ -136,7 +137,22 @@ func setLogInGroup(engine *gin.Engine) {
 	loginGroup.POST("/", loginCheck, handleGetName)
 }
 
-func InitRouter(engine *gin.Engine) {
+func InitEngine(engine *gin.Engine) {
+	initSession(engine)
+	initSource(engine)
+	initRouter(engine)
+}
+
+func initSession(engine *gin.Engine) {
+	store := memstore.NewStore([]byte("user_id"))
+	engine.Use(sessions.Sessions("user_id", store))
+}
+
+func initSource(engine *gin.Engine) {
+	engine.LoadHTMLGlob("../templates/*")
+}
+
+func initRouter(engine *gin.Engine) {
 	//保存之前访问的页面，用于重复登陆返回页面,这里要先检查是否登陆在保存页面
 	engine.Use(sessionCheck)
 	//login界面和跳转界面不用保存，总不能登陆之后再跳回login或者跳转界面，会死循环
