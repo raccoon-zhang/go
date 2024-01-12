@@ -90,35 +90,42 @@
 
 <body>
   <div id="register_box">
-    <h2>LOGIN</h2>
-    <div id="input_box">
-      <input type="text" id="name" placeholder="请输入用户名">
-    </div>
 
-    <div class="input_box">
-      <input type="text" id="age" placeholder="年龄">
-    </div>
-    
-    <div class="input_box">
-      <input type="password" id="password" placeholder="请输入密码">
-    </div>
-    <div class="input_box">
-      <input type="password" id="repeat_password" placeholder="请再输入一次密码">
-      <span id="password_check" hidden="true"></span>
-    </div>
-    <button id="register">注册</button><br>
+    <h2>REGISTE</h2>
+    <form id="register_form">
+      <div id="input_box">
+        <input type="text" id="name" placeholder="请输入用户名" required>
+      </div>
+      <div class="input_box">
+        <input type="text" id="age" placeholder="年龄" required>
+      </div>
+      <div class="input_box">
+        <input type="password" id="password" placeholder="请输入密码" required>
+      </div>
+      <div class="input_box">
+        <input type="password" id="repeat_password" placeholder="请再输入一次密码" required>
+        <span id="password_check" hidden="true"></span>
+      </div>
+      <button type="submit" id="register">注册</button><br>
+    </form>
   </div>
 
   <script>
     window.onload = function() {
-      document.getElementById("register").addEventListener("click", function(event) {
+      document.getElementById("register_form").addEventListener("submit", function(event) {
         event.preventDefault(); // 阻止表单默认提交行为
 
-        
         var name = document.getElementById("name").value;
         var password = document.getElementById("password").value;
         var repeatPassword = document.getElementById("repeat_password").value
         var age = document.getElementById("age").value
+
+        if (name == "" || password == "" || repeatPassword == "" || age == "") {
+          var item = document.getElementById("password_check")
+          item.innerText = "信息不完整"
+          item.hidden = false
+          return
+        }
      
         if (repeatPassword != password) {
           var item = document.getElementById("password_check")
@@ -151,7 +158,7 @@
               item.innerText = "注册成功, 3s后返回登陆页面"
               var remainTime = 3
               function updateRemainTime() {
-                    item.innerText = "注册成功," + remainTime +"秒后返回登陆前页面"
+                    item.innerText = "注册成功," + remainTime +"秒后返回登陆页面"
                     remainTime--
                     if (remainTime > 0) {
                       setTimeout(updateRemainTime, 1000)
