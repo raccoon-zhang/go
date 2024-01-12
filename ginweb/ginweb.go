@@ -15,6 +15,7 @@ import (
 )
 
 const loginPath string = "/login"
+const registePath string = "/registe"
 
 var pool *dbPool.Pool
 var redisCtx context.Context
@@ -45,12 +46,6 @@ func savePrePage(c *gin.Context) {
 	c.Next()
 	setSessionVal("prepage", c.Request.URL.Path, c)
 	fmt.Println("save prepage:", c.Request.URL.Path)
-}
-func handleGetName(c *gin.Context) {
-	var name = c.PostForm("name")
-	var password = c.PostForm("password")
-	fmt.Println("name: ", name)
-	fmt.Println("password: ", password)
 }
 
 func mustLogin(c *gin.Context) {
@@ -159,48 +154,6 @@ func loginCheck(c *gin.Context) {
 	} else {
 		c.Abort()
 	}
-
-	// var isPass = false
-	// db, err := pool.NewDb()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
-	// defer func() {
-	// 	if isPass {
-	// 		fmt.Println("pass")
-	// 		c.JSON(http.StatusOK, gin.H{"status": "true"})
-	// 		c.Next()
-	// 	} else {
-	// 		fmt.Println("noPass")
-	// 		c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
-	// 		c.Abort()
-	// 	}
-	// 	pool.DeleteDb(db)
-	// }()
-
-	// var sqlString = "select name,password from student where name = ?"
-	// ret, err := db.Query(sqlString, name)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// for ret.Next() {
-	// 	var name string
-	// 	var passwordHash string
-	// 	ret.Scan(&name, &passwordHash)
-	// 	if tools.PasswordDecrypt(passwordHash, password) {
-	// 		isPass = true
-	// 		session := sessions.Default(c)
-	// 		session.Set("userKey", name)
-	// 		session.Save()
-	// 		err := rdb.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
-	// 		if err != nil {
-	// 			fmt.Println(err)
-	// 		}
-	// 	}
-	// }
 }
 
 func getPrePageUrl(c *gin.Context) string {
@@ -232,7 +185,98 @@ func setLogInGroup(engine *gin.Engine) {
 	loginGroup.GET("/", multiLoginCheck, func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", "")
 	})
-	loginGroup.POST("/", loginCheck, handleGetName)
+	loginGroup.POST("/", loginCheck)
+}
+
+func setRegisteInGroup(engine *gin.Engine) {
+	registeGroup := engine.Group(registePath)
+	registeGroup.GET("/", multiLoginCheck, func(c *gin.Context) {
+		c.HTML(http.StatusOK, "registe.html", "")
+	})
+	registeGroup.POST("/", registeUser)
+}
+
+func registeUser(c *gin.Context) {
+	var name string
+	var password string
+	var age string
+	if c.Request.Method == http.MethodGet {
+		name = c.Param("name")
+		password = c.Param("password")
+		age = c.Param("age")
+	} else if c.Request.Method == http.MethodPost {
+		name = c.PostForm("name")
+		password = c.PostForm("password")
+		age = c.PostForm("age")
+	}
+
+	var isPass = false
+	defer func() {
+		if isPass {
+			fmt.Println("registe success")
+			c.JSON(http.StatusOK, gin.H{"status": "true"})
+			c.Next()
+		} else {
+			fmt.Println("registe failed")
+			c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
+			c.Abort()
+		}
+	}()
+
+	if sqlRegisteUser(name, age, password) {
+		redisRegisteUser(name, password)
+		isPass = true
+	}
+}
+
+func redisRegisteUser(name, password string) bool {
+	passwordHash, err := tools.PasswordEncrypt(password)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	err = rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
+	if err != nil {
+		fmt.Println(err)
+		return false
+	} else {
+		return true
+	}
+}
+
+func sqlRegisteUser(name, age, password string) bool {
+	passwordHash, err := tools.PasswordEncrypt(password)
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	db, err := pool.NewDb()
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	defer func() {
+		pool.DeleteDb(db)
+	}()
+
+	stmt, err := db.Prepare("insert into student(name,age,password) values(?,?,?)")
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	_, err = stmt.Exec(name, age, passwordHash)
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	} else {
+		return true
+	}
 }
 
 func InitEngine(engine *gin.Engine) {
@@ -255,6 +299,7 @@ func initRouter(engine *gin.Engine) {
 	engine.Use(sessionCheck)
 	//login界面和跳转界面不用保存，总不能登陆之后再跳回login或者跳转界面，会死循环
 	setLogInGroup(engine)
+	setRegisteInGroup(engine)
 	engine.GET("/backPage", backPage)
 	//保存界面
 	engine.Use(savePrePage)

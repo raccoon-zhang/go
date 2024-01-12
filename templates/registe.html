@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      background: url('https://cdn.pixabay.com/photo/2018/08/14/13/23/ocean-3605547_1280.jpg') no-repeat;
+      background-size: 100% 130%;
+    }
+
+    #register_box {
+      width: 20%;
+      height: 400px;
+      background-color: #00000060;
+      margin: auto;
+      margin-top: 10%;
+      text-align: center;
+      border-radius: 10px;
+      padding: 50px 50px;
+    }
+
+    h2 {
+      color: #ffffff90;
+      margin-top: 5%;
+    }
+
+    #input-box {
+      margin-top: 5%;
+    }
+
+    span {
+      color: #fff;
+    }
+
+    input {
+      border: 0;
+      width: 60%;
+      font-size: 15px;
+      color: #fff;
+      background: transparent;
+      border-bottom: 2px solid #fff;
+      padding: 5px 10px;
+      outline: none;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 50px;
+      width: 60%;
+      height: 30px;
+      border-radius: 10px;
+      border: 0;
+      color: #fff;
+      text-align: center;
+      line-height: 30px;
+      font-size: 15px;
+      background-image: linear-gradient(to right, #30cfd0, #330867);
+    }
+
+    #sign_up {
+      margin-top: 45%;
+      margin-left: 60%;
+    }
+
+    a {
+      color: #b94648;
+    }
+
+    .input_box {
+      position: relative;
+    }
+
+    #password_check,#repeat_password{
+      position: relative;
+    }
+
+    #password_check{
+      position: absolute;
+      right: 40px;
+      bottom: -30px;
+      font-size: small;
+      color: orange;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="register_box">
+    <h2>LOGIN</h2>
+    <div id="input_box">
+      <input type="text" id="name" placeholder="请输入用户名">
+    </div>
+
+    <div class="input_box">
+      <input type="text" id="age" placeholder="年龄">
+    </div>
+    
+    <div class="input_box">
+      <input type="password" id="password" placeholder="请输入密码">
+    </div>
+    <div class="input_box">
+      <input type="password" id="repeat_password" placeholder="请再输入一次密码">
+      <span id="password_check" hidden="true"></span>
+    </div>
+    <button id="register">注册</button><br>
+  </div>
+
+  <script>
+    window.onload = function() {
+      document.getElementById("register").addEventListener("click", function(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+
+        
+        var name = document.getElementById("name").value;
+        var password = document.getElementById("password").value;
+        var repeatPassword = document.getElementById("repeat_password").value
+        var age = document.getElementById("age").value
+     
+        if (repeatPassword != password) {
+          var item = document.getElementById("password_check")
+          item.innerText = "密码输入不一致"
+          item.hidden = false
+          return
+        }
+    
+        //POST URL
+        var url = "/registe";
+        var formData = new FormData();
+        formData.append("name", name);
+        formData.append("age", age)
+        formData.append("password", password);
+
+        // 发送请求到后端
+        // 可以使用fetch、XMLHttpRequest等方法发送请求
+        // 以下示例使用fetch发送POST请求
+        fetch(url, {
+          method: "POST",
+          body: formData
+        })
+        .then(function(response) {
+          // 处理响应
+          response.json().then(function(data) {
+            var item = document.getElementById("password_check")
+            item.hidden = false
+            if (data.status == "true") {
+              console.log("success")
+              item.innerText = "注册成功, 3s后返回登陆页面"
+              var remainTime = 3
+              function updateRemainTime() {
+                    item.innerText = "注册成功," + remainTime +"秒后返回登陆前页面"
+                    remainTime--
+                    if (remainTime > 0) {
+                      setTimeout(updateRemainTime, 1000)
+                    } else {
+                      window.location.href = "/login"
+                    }
+              }
+              updateRemainTime()
+            } else {
+              item.innerText = "注册失败，用户已存在"
+              console.log("false")
+            }
+          })
+        })
+        .catch(function(error) {
+          // 处理错误
+        });
+      });
+    };
+  </script>
+</body>
+
+</html>
+
+
