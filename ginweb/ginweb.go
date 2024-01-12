@@ -1,19 +1,25 @@
 package ginweb
 
 import (
+	"context"
 	"fmt"
 	"local/dbPool"
 	"local/tools"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 const loginPath string = "/login"
 
 var pool *dbPool.Pool
+var redisCtx context.Context
+var rdbRead *redis.Client
+var rdbWrite *redis.Client
 
 func init() {
 	var err error
@@ -21,14 +27,23 @@ func init() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	redisCtx = context.Background()
+	rdbRead = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6380",
+		Password: "",
+		DB:       0,
+	})
+	rdbWrite = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
 }
 
 func savePrePage(c *gin.Context) {
 	//其他的中间件执行完毕之后再更新当前页面，否则不更新
 	c.Next()
-	session := sessions.Default(c)
-	session.Set("prepage", c.Request.URL.Path)
-	session.Save()
+	setSessionVal("prepage", c.Request.URL.Path, c)
 	fmt.Println("save prepage:", c.Request.URL.Path)
 }
 func handleGetName(c *gin.Context) {
@@ -55,6 +70,63 @@ func sessionCheck(c *gin.Context) {
 	}
 }
 
+func setSessionVal(key, value any, c *gin.Context) {
+	session := sessions.Default(c)
+	session.Set(key, value)
+	session.Save()
+}
+
+func removeSessionVal(key any, c *gin.Context) {
+	session := sessions.Default(c)
+	session.Delete(key)
+	session.Save()
+}
+
+func redisloginCheck(name, password string, c *gin.Context) bool {
+	passwordHash, err := rdbRead.Get(redisCtx, name).Result()
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	if tools.PasswordDecrypt(passwordHash, password) {
+		setSessionVal("userKey", passwordHash, c)
+		fmt.Println("redis check")
+		return true
+	}
+	return false
+}
+
+func sqlLoginCheck(name, password string, c *gin.Context) bool {
+	db, err := pool.NewDb()
+	if err != nil {
+		return false
+	}
+	defer func() {
+		pool.DeleteDb(db)
+	}()
+	var sqlString = "select name,password from student where name = ?"
+	ret, err := db.Query(sqlString, name)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	for ret.Next() {
+		var name string
+		var passwordHash string
+		ret.Scan(&name, &passwordHash)
+		if tools.PasswordDecrypt(passwordHash, password) {
+			setSessionVal("userKey", name, c)
+			err := rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println("sql check")
+			return true
+		}
+	}
+	return false
+}
+
 func loginCheck(c *gin.Context) {
 	var name string
 	var password string
@@ -67,12 +139,6 @@ func loginCheck(c *gin.Context) {
 	}
 
 	var isPass = false
-	db, err := pool.NewDb()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
 	defer func() {
 		if isPass {
 			fmt.Println("pass")
@@ -83,26 +149,58 @@ func loginCheck(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
 			c.Abort()
 		}
-		pool.DeleteDb(db)
 	}()
+	if redisloginCheck(name, password, c) {
+		fmt.Println("redis check")
+		isPass = true
+	} else if sqlLoginCheck(name, password, c) {
+		fmt.Println("sql check")
+		isPass = true
+	} else {
+		c.Abort()
+	}
 
-	var sqlString = "select name,password from student where name = ?"
-	ret, err := db.Query(sqlString, name)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	for ret.Next() {
-		var name string
-		var passwordHash string
-		ret.Scan(&name, &passwordHash)
-		if tools.PasswordDecrypt(passwordHash, password) {
-			isPass = true
-			session := sessions.Default(c)
-			session.Set("userKey", name)
-			session.Save()
-		}
-	}
+	// var isPass = false
+	// db, err := pool.NewDb()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+
+	// defer func() {
+	// 	if isPass {
+	// 		fmt.Println("pass")
+	// 		c.JSON(http.StatusOK, gin.H{"status": "true"})
+	// 		c.Next()
+	// 	} else {
+	// 		fmt.Println("noPass")
+	// 		c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
+	// 		c.Abort()
+	// 	}
+	// 	pool.DeleteDb(db)
+	// }()
+
+	// var sqlString = "select name,password from student where name = ?"
+	// ret, err := db.Query(sqlString, name)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// for ret.Next() {
+	// 	var name string
+	// 	var passwordHash string
+	// 	ret.Scan(&name, &passwordHash)
+	// 	if tools.PasswordDecrypt(passwordHash, password) {
+	// 		isPass = true
+	// 		session := sessions.Default(c)
+	// 		session.Set("userKey", name)
+	// 		session.Save()
+	// 		err := rdb.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
+	// 		if err != nil {
+	// 			fmt.Println(err)
+	// 		}
+	// 	}
+	// }
 }
 
 func getPrePageUrl(c *gin.Context) string {
@@ -165,5 +263,8 @@ func initRouter(engine *gin.Engine) {
 	})
 	engine.GET("/check", mustLogin, func(c *gin.Context) {
 
+	})
+	engine.GET("/logout", func(c *gin.Context) {
+		removeSessionVal("userKey", c)
 	})
 }
