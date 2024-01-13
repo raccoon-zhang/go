@@ -19,26 +19,19 @@ const registePath string = "/registe"
 
 var pool *dbPool.Pool
 var redisCtx context.Context
-var rdbRead *redis.Client
-var rdbWrite *redis.Client
 
 func init() {
 	var err error
-	pool, err = dbPool.InitPool("mysql", "root:@/school", 10)
+	var masterRedis = &redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	}
+	pool, err = dbPool.InitPool("mysql", "root:@/school", masterRedis, 10)
 	if err != nil {
 		fmt.Println(err)
 	}
 	redisCtx = context.Background()
-	rdbRead = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6380",
-		Password: "",
-		DB:       0,
-	})
-	rdbWrite = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
 }
 
 func savePrePage(c *gin.Context) {
@@ -56,6 +49,7 @@ func mustLogin(c *gin.Context) {
 }
 
 func sessionCheck(c *gin.Context) {
+	//这里用来设置之后需要添加的右上角登陆状态
 	id := sessions.Default(c).Get("userKey")
 	if id == nil {
 		fmt.Println("you have not login")
@@ -78,14 +72,23 @@ func removeSessionVal(key any, c *gin.Context) {
 }
 
 func redisloginCheck(name, password string, c *gin.Context) bool {
+	rdbRead := pool.NewRedisCliForRead(&redis.Options{
+		Addr:     "localhost:6380",
+		Password: "",
+		DB:       0,
+	})
+
+	defer func() {
+		pool.DeleteRedisCli(rdbRead)
+	}()
+
 	passwordHash, err := rdbRead.Get(redisCtx, name).Result()
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 	if tools.PasswordDecrypt(passwordHash, password) {
-		setSessionVal("userKey", passwordHash, c)
-		fmt.Println("redis check")
+		setSessionVal("userKey", name, c)
 		return true
 	}
 	return false
@@ -111,11 +114,14 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 		ret.Scan(&name, &passwordHash)
 		if tools.PasswordDecrypt(passwordHash, password) {
 			setSessionVal("userKey", name, c)
+			rdbWrite := pool.NewRedisCliForWrite()
+			defer func() {
+				pool.DeleteRedisCli(rdbWrite)
+			}()
 			err := rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println("sql check")
 			return true
 		}
 	}
@@ -235,6 +241,11 @@ func redisRegisteUser(name, password string) bool {
 		fmt.Println(err)
 		return false
 	}
+	rdbWrite := pool.NewRedisCliForWrite()
+	defer func() {
+		pool.DeleteRedisCli(rdbWrite)
+	}()
+
 	err = rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
 	if err != nil {
 		fmt.Println(err)
@@ -297,9 +308,13 @@ func initSource(engine *gin.Engine) {
 func initRouter(engine *gin.Engine) {
 	//保存之前访问的页面，用于重复登陆返回页面,这里要先检查是否登陆在保存页面
 	engine.Use(sessionCheck)
-	//login界面和跳转界面不用保存，总不能登陆之后再跳回login或者跳转界面，会死循环
+	//登陆注册相关界面不用保存，总不能登陆之后再跳回，会死循环
 	setLogInGroup(engine)
 	setRegisteInGroup(engine)
+	engine.GET("/logout", func(c *gin.Context) {
+		removeSessionVal("userKey", c)
+		fmt.Println("您已退出登陆")
+	})
 	engine.GET("/backPage", backPage)
 	//保存界面
 	engine.Use(savePrePage)
@@ -308,8 +323,5 @@ func initRouter(engine *gin.Engine) {
 	})
 	engine.GET("/check", mustLogin, func(c *gin.Context) {
 
-	})
-	engine.GET("/logout", func(c *gin.Context) {
-		removeSessionVal("userKey", c)
 	})
 }
