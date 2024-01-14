@@ -14,12 +14,12 @@ type Pool struct {
 	busyPool    sync.Map
 	freePool    sync.Map
 	isDestroyed bool
-	masterOps   *redis.Options
+	failoverOps *redis.FailoverOptions
 }
 
-func InitPool(driver, dsn string, ops *redis.Options, size int) (*Pool, error) {
+func InitPool(driver, dsn string, ops *redis.FailoverOptions, size int) (*Pool, error) {
 	var pool = &Pool{}
-	pool.masterOps = ops
+	pool.failoverOps = ops
 	for count := 0; count < size; count++ {
 		db, err := sql.Open(driver, dsn)
 		if err != nil {
@@ -79,13 +79,27 @@ func (pool Pool) DestroyPool() {
 }
 
 func (pool Pool) NewRedisCliForWrite() *redis.Client {
-	return redis.NewClient(pool.masterOps)
+	//获取主节点用于写操作
+	client := redis.NewFailoverClient(pool.failoverOps)
+	return client
 }
 
-func (pool Pool) NewRedisCliForRead(ops *redis.Options) *redis.Client {
-	return redis.NewClient(ops)
+func (pool Pool) NewRedisCliForRead(ops *redis.Options) *redis.ClusterClient {
+	// 创建Redis哨兵客户端实例
+	client := redis.NewFailoverClusterClient(&redis.FailoverOptions{
+		MasterName:    pool.failoverOps.MasterName,    // 主节点的名称
+		SentinelAddrs: pool.failoverOps.SentinelAddrs, // 哨兵节点的地址列表
+		RouteRandomly: true,                           //随机节点
+	})
+	return client
 }
 
-func (pool Pool) DeleteRedisCli(cli *redis.Client) {
-	cli.Close()
+func (pool Pool) DeleteRedisCli(cli any) {
+	if val, ok := cli.(*redis.Client); ok {
+		val.Close()
+	} else if val, ok := cli.(*redis.ClusterClient); ok {
+		val.Close()
+	} else {
+		fmt.Println("you passed a wrong client")
+	}
 }

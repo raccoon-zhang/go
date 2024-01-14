@@ -22,12 +22,12 @@ var redisCtx context.Context
 
 func init() {
 	var err error
-	var masterRedis = &redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+	var falioverOps = &redis.FailoverOptions{
+		MasterName:    "localmaster",
+		SentinelAddrs: []string{"localhost:26379", "localhost:26380"},
 	}
-	pool, err = dbPool.InitPool("mysql", "root:@/school", masterRedis, 10)
+
+	pool, err = dbPool.InitPool("mysql", "root:@/school", falioverOps, 10)
 	if err != nil {
 		fmt.Println(err)
 	}
