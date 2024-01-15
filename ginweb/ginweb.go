@@ -131,13 +131,8 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 func loginCheck(c *gin.Context) {
 	var name string
 	var password string
-	if c.Request.Method == http.MethodGet {
-		name = c.Param("name")
-		password = c.Param("password")
-	} else if c.Request.Method == http.MethodPost {
-		name = c.PostForm("name")
-		password = c.PostForm("password")
-	}
+	name = c.PostForm("name")
+	password = c.PostForm("password")
 
 	var isPass = false
 	defer func() {
@@ -206,15 +201,9 @@ func registeUser(c *gin.Context) {
 	var name string
 	var password string
 	var age string
-	if c.Request.Method == http.MethodGet {
-		name = c.Param("name")
-		password = c.Param("password")
-		age = c.Param("age")
-	} else if c.Request.Method == http.MethodPost {
-		name = c.PostForm("name")
-		password = c.PostForm("password")
-		age = c.PostForm("age")
-	}
+	name = c.PostForm("name")
+	password = c.PostForm("password")
+	age = c.PostForm("age")
 
 	var isPass = false
 	defer func() {
@@ -308,6 +297,7 @@ func initSource(engine *gin.Engine) {
 func initRouter(engine *gin.Engine) {
 	//保存之前访问的页面，用于重复登陆返回页面,这里要先检查是否登陆在保存页面
 	engine.Use(sessionCheck)
+
 	//登陆注册相关界面不用保存，总不能登陆之后再跳回，会死循环
 	setLogInGroup(engine)
 	setRegisteInGroup(engine)
@@ -316,12 +306,13 @@ func initRouter(engine *gin.Engine) {
 		fmt.Println("您已退出登陆")
 	})
 	engine.GET("/backPage", backPage)
+
 	//保存界面
 	engine.Use(savePrePage)
 	engine.GET("/", func(c *gin.Context) {
 		fmt.Println("hello world")
 	})
-	engine.GET("/check", mustLogin, func(c *gin.Context) {
-
+	engine.GET("/chat", mustLogin, func(c *gin.Context) {
+		c.HTML(http.StatusOK, "chat.html", "")
 	})
 }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Box</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .chat-container {
+            width: 400px;
+            height: 500px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            border-radius: 5px; 
+        }
+        
+        .message {
+            background: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .user-message {
+            background: #e2e2ff;
+            align-self: flex-end;
+            text-align: right;
+            display: inline-block;
+        }
+        
+        .bot-message {
+            background: #eaffea;
+
+            width: auto;
+        }
+        
+        .input-container input {
+            width: 300px;
+            padding: 5px;
+            margin-top: 5px;
+            border-radius: 10px;
+        }
+        
+        .input-container button {
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="message bot-message">Hello! How can I assist you today?</div>
+    </div>
+    <div class="input-container">
+        <input type="text" id="message-input" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var messageInput = document.getElementById('message-input');
+            var message = messageInput.value;
+            if (message) {
+                var chatContainer = document.querySelector('.chat-container');
+                var messageElement = document.createElement('div');
+                messageElement.innerText = message;
+                messageElement.classList.add('message', 'user-message');
+                chatContainer.appendChild(messageElement);
+                messageInput.value = '';
+                // 在此处添加处理发送消息的逻辑
+            }
+        }
+    </script>
+</body>
+</html>
