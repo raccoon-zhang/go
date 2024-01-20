@@ -5,4 +5,5 @@ use (
 	./ginweb
 	./main
 	./tools
+	./gptChat
 )

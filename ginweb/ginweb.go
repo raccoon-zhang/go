@@ -3,6 +3,7 @@ package ginweb
 import (
 	"context"
 	"fmt"
+	"gptChat"
 	"local/dbPool"
 	"local/tools"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 
 const loginPath string = "/login"
 const registePath string = "/registe"
+const chatPath string = "/chat"
 
 var pool *dbPool.Pool
 var redisCtx context.Context
@@ -38,7 +40,6 @@ func savePrePage(c *gin.Context) {
 	//其他的中间件执行完毕之后再更新当前页面，否则不更新
 	c.Next()
 	setSessionVal("prepage", c.Request.URL.Path, c)
-	fmt.Println("save prepage:", c.Request.URL.Path)
 }
 
 func mustLogin(c *gin.Context) {
@@ -52,10 +53,9 @@ func sessionCheck(c *gin.Context) {
 	//这里用来设置之后需要添加的右上角登陆状态
 	id := sessions.Default(c).Get("userKey")
 	if id == nil {
-		fmt.Println("you have not login")
+		//没有登陆
 	} else {
-		fmt.Println(id)
-		fmt.Println("yong have login")
+		//已经登陆
 	}
 }
 
@@ -137,20 +137,16 @@ func loginCheck(c *gin.Context) {
 	var isPass = false
 	defer func() {
 		if isPass {
-			fmt.Println("pass")
 			c.JSON(http.StatusOK, gin.H{"status": "true"})
 			c.Next()
 		} else {
-			fmt.Println("noPass")
 			c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
 			c.Abort()
 		}
 	}()
 	if redisloginCheck(name, password, c) {
-		fmt.Println("redis check")
 		isPass = true
 	} else if sqlLoginCheck(name, password, c) {
-		fmt.Println("sql check")
 		isPass = true
 	} else {
 		c.Abort()
@@ -175,7 +171,6 @@ func multiLoginCheck(c *gin.Context) {
 	id := sessions.Default(c).Get("userKey")
 	if id != nil {
 		var url = getPrePageUrl(c)
-		fmt.Println("no need to login multiptly ,redirect to", url)
 		c.Redirect(http.StatusTemporaryRedirect, url)
 		c.Abort()
 	}
@@ -197,6 +192,24 @@ func setRegisteInGroup(engine *gin.Engine) {
 	registeGroup.POST("/", registeUser)
 }
 
+func setChatGrop(engine *gin.Engine) {
+	chatGroup := engine.Group(chatPath, mustLogin)
+	chatGroup.GET("/", savePrePage, func(c *gin.Context) {
+		c.HTML(http.StatusOK, "chat.html", "")
+	})
+	chatGroup.POST("/queryGpt", func(c *gin.Context) {
+		go func() {
+			msg := c.PostForm("userMessage")
+			date, err := gptChat.QueryGpt(msg)
+			if err != nil {
+				c.JSON(http.StatusOK, nil)
+			} else {
+				c.JSON(http.StatusOK, gin.H{"botResponce": date})
+			}
+		}()
+	})
+}
+
 func registeUser(c *gin.Context) {
 	var name string
 	var password string
@@ -208,11 +221,9 @@ func registeUser(c *gin.Context) {
 	var isPass = false
 	defer func() {
 		if isPass {
-			fmt.Println("registe success")
 			c.JSON(http.StatusOK, gin.H{"status": "true"})
 			c.Next()
 		} else {
-			fmt.Println("registe failed")
 			c.JSON(http.StatusUnauthorized, gin.H{"status": "false"})
 			c.Abort()
 		}
@@ -298,21 +309,19 @@ func initRouter(engine *gin.Engine) {
 	//保存之前访问的页面，用于重复登陆返回页面,这里要先检查是否登陆在保存页面
 	engine.Use(sessionCheck)
 
-	//登陆注册相关界面不用保存，总不能登陆之后再跳回，会死循环
+	//首页
+	engine.GET("/", savePrePage, func(c *gin.Context) {
+		fmt.Println("hello world")
+	})
+
+	//登陆注册
 	setLogInGroup(engine)
 	setRegisteInGroup(engine)
 	engine.GET("/logout", func(c *gin.Context) {
 		removeSessionVal("userKey", c)
-		fmt.Println("您已退出登陆")
 	})
 	engine.GET("/backPage", backPage)
 
-	//保存界面
-	engine.Use(savePrePage)
-	engine.GET("/", func(c *gin.Context) {
-		fmt.Println("hello world")
-	})
-	engine.GET("/chat", mustLogin, func(c *gin.Context) {
-		c.HTML(http.StatusOK, "chat.html", "")
-	})
+	//聊天页
+	setChatGrop(engine)
 }

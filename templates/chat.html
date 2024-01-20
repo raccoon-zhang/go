@@ -94,8 +94,22 @@
                 var messageElement = genereteMessageElem(message, "user")
                 chatContainer.appendChild(messageElement);
                 messageInput.value = ''
+            } else {
+                return
             }
-            // 在此处添加处理发送消息的逻辑
+
+            var formData = new FormData();
+            formData.append("userMessage", message);
+            fetch("/chat/queryGpt", {
+                method:"POST",
+                body: formData
+                }).then(function(response) {
+                    response.json().then(function(data) {
+                    var botMSg = data["botResponce"]
+                    botElement = genereteMessageElem(botMSg, "bot")
+                    chatContainer.appendChild(botElement)
+                })
+            })
         }
     </script>
 </body>
