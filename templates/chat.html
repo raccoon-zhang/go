@@ -18,26 +18,30 @@
             overflow-y: scroll;
             border-radius: 5px; 
         }
-        
+
+        .chat-item {
+            display: flex;
+        }
+
+        .bot-chat-item {
+            margin-right: auto;
+            background: #eaffea;
+        }
+
+        .user-chat-item {
+            margin-left: auto;
+            background: #e2e2ff;
+        }
+
         .message {
-            background: #f1f1f1;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
+            max-width: 200px;
+            text-align: left;
+            width: fit-content;
         }
-        
-        .user-message {
-            background: #e2e2ff;
-            align-self: flex-end;
-            text-align: right;
-            display: inline-block;
-        }
-        
-        .bot-message {
-            background: #eaffea;
 
-            width: auto;
-        }
         
         .input-container input {
             width: 300px;
@@ -49,11 +53,14 @@
         .input-container button {
             padding: 5px 10px;
         }
+        
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div class="message bot-message">Hello! How can I assist you today?</div>
+        <div class="chat-item">
+        <div class="message bot-message bot-chat-item">Hello! How can I assist you today?</div>
+        </div>
     </div>
     <div class="input-container">
         <input type="text" id="message-input" placeholder="Type your message..." />
@@ -61,18 +68,34 @@
     </div>
 
     <script>
+        function genereteMessageElem(message, sender) {
+            var element = document.createElement('div')
+            element.classList.add('chat-item')
+            var innerElement = document.createElement('div')
+            innerElement.classList.add('message')
+
+            if (sender == 'user') {
+                innerElement.classList.add('user-chat-item','user-message')
+            } else {
+                innerElement.classList.add('bot-chat-item','bot-message')
+            }
+            innerElement.innerText = message
+
+            element.appendChild(innerElement)
+
+            return element
+        }
+
         function sendMessage() {
             var messageInput = document.getElementById('message-input');
             var message = messageInput.value;
+            var chatContainer = document.querySelector('.chat-container');
             if (message) {
-                var chatContainer = document.querySelector('.chat-container');
-                var messageElement = document.createElement('div');
-                messageElement.innerText = message;
-                messageElement.classList.add('message', 'user-message');
+                var messageElement = genereteMessageElem(message, "user")
                 chatContainer.appendChild(messageElement);
-                messageInput.value = '';
-                // 在此处添加处理发送消息的逻辑
+                messageInput.value = ''
             }
+            // 在此处添加处理发送消息的逻辑
         }
     </script>
 </body>
