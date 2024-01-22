@@ -58,7 +58,7 @@ func QueryGpt(userMsg string) (*string, error) {
 	responce, err := http.Post(gptUrl, "application/json", bytes.NewBuffer(jsonData))
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("here", err)
 		return nil, err
 	} else {
 		defer responce.Body.Close()

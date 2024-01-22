@@ -198,10 +198,11 @@ func setChatGrop(engine *gin.Engine) {
 		c.HTML(http.StatusOK, "chat.html", "")
 	})
 	chatGroup.POST("/queryGpt", func(c *gin.Context) {
+		msg := c.PostForm("userMessage")
 		go func() {
-			msg := c.PostForm("userMessage")
 			date, err := gptChat.QueryGpt(msg)
 			if err != nil {
+				fmt.Println(err)
 				c.JSON(http.StatusOK, nil)
 			} else {
 				c.JSON(http.StatusOK, gin.H{"botResponce": date})
