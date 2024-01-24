@@ -3,6 +3,8 @@ package gptChat
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -26,6 +28,25 @@ type RequestInfo struct {
 	PresencePenalty  float64  `json:"presence_penalty"`
 	FrequencyPenalty float64  `json:"frequency_penalty"`
 	User             string   `json:"user"`
+}
+
+type UsageInfo struct {
+	PromptTokens     uint `json:"prompt_tokens"`
+	CompletionTokens uint `json:"completion_tokens"`
+	TotalTokens      uint `json:"total_tokens"`
+}
+
+// gpt返回信息
+type responceInfo struct {
+	Id      string    `json:"id"`
+	Object  string    `json:"object"`
+	Created uint      `json:"created"`
+	Usage   UsageInfo `json:"usage"`
+	Choices struct {
+		Msg          msgBox `json:"message"`
+		FinishReason string `json:"finish_reason"`
+		Index        uint   `json:"index"`
+	}
 }
 
 var gptUrl = "https://api.openai.com/v1/chat/completions"
@@ -61,11 +82,17 @@ func QueryGpt(userMsg string) (interface{}, error) {
 	} else {
 		defer responce.Body.Close()
 		responceBody, err := io.ReadAll(responce.Body)
-		if err != nil {
-			return nil, err
+		if err != nil || responce.StatusCode != http.StatusOK {
+			fmt.Println("err:", err)
+			fmt.Println("responceBody:", responceBody)
+			return nil, errors.New("read responceBody wrong")
 		} else {
-			var ret = string(responceBody)
-			return ret, nil
+			var responceJsonData responceInfo
+			err := json.Unmarshal(responceBody, &responceJsonData)
+			if err != nil {
+				return nil, err
+			}
+			return responceJsonData.Choices.Msg, nil
 		}
 	}
 }
