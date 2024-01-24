@@ -3,7 +3,6 @@ package gptChat
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -44,7 +43,7 @@ func (defaultReqInfo *RequestInfo) setDefatuReqInfo() {
 	defaultReqInfo.Messages = append(defaultReqInfo.Messages, msg)
 }
 
-func QueryGpt(userMsg string) (*string, error) {
+func QueryGpt(userMsg string) (interface{}, error) {
 	var reqInfo RequestInfo
 	reqInfo.setDefatuReqInfo()
 	reqInfo.Messages = append(reqInfo.Messages, msgBox{
@@ -53,22 +52,20 @@ func QueryGpt(userMsg string) (*string, error) {
 	})
 	jsonData, err := json.Marshal(reqInfo)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	responce, err := http.Post(gptUrl, "application/json", bytes.NewBuffer(jsonData))
 
 	if err != nil {
-		fmt.Println("here", err)
 		return nil, err
 	} else {
 		defer responce.Body.Close()
 		responceBody, err := io.ReadAll(responce.Body)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		} else {
 			var ret = string(responceBody)
-			return &ret, nil
+			return ret, nil
 		}
 	}
 }

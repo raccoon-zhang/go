@@ -200,12 +200,13 @@ func setChatGrop(engine *gin.Engine) {
 	chatGroup.POST("/queryGpt", func(c *gin.Context) {
 		msg := c.PostForm("userMessage")
 		go func() {
-			date, err := gptChat.QueryGpt(msg)
+			data, err := gptChat.QueryGpt(msg)
 			if err != nil {
 				fmt.Println(err)
-				c.JSON(http.StatusOK, nil)
+				c.JSON(http.StatusOK, gin.H{"botResponce": "something wrong, not your fault"})
 			} else {
-				c.JSON(http.StatusOK, gin.H{"botResponce": date})
+				fmt.Println(data)
+				c.JSON(http.StatusOK, gin.H{"botResponce": data})
 			}
 		}()
 	})

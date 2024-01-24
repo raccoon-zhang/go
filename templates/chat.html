@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat Box</title>
+    <meta charset="UTF-8">
+    <title>Your Chat</title>
     <style>
         body {
             display: flex;
@@ -9,14 +10,18 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background: url('https://cdn.pixabay.com/photo/2018/08/14/13/23/ocean-3605547_1280.jpg') no-repeat;
+            background-size: 100% 130%;
         }
         
+        .container {
+            overflow-y: scroll;
+        }
+
         .chat-container {
             width: 400px;
             height: 500px;
-            border: 1px solid #ccc;
             overflow-y: scroll;
-            border-radius: 5px; 
         }
 
         .chat-item {
@@ -40,7 +45,6 @@
             text-align: left;
             width: fit-content;
         }
-  
         .input-container input {
             width: 300px;
             padding: 5px;
@@ -55,16 +59,17 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-item">
-        <div class="message bot-message bot-chat-item">Hello! How can I assist you today?</div>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-item">
+            <div class="message bot-message bot-chat-item">Hello! How can I assist you today?</div>
+            </div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="Type your message..." />
+            <button onclick="sendMessage()">Send</button>
         </div>
     </div>
-    <div class="input-container">
-        <input type="text" id="message-input" placeholder="Type your message..." />
-        <button onclick="sendMessage()">Send</button>
-    </div>
-
     <script>
         function genereteMessageElem(message, sender) {
             var element = document.createElement('div')
