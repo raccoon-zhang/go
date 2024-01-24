@@ -213,11 +213,9 @@ func setChatGrop(engine *gin.Engine) {
 		}()
 
 		select {
-		case data, ok := <-responceChan:
-			if ok {
-				c.JSON(http.StatusOK, gin.H{"botResponce": data})
-			}
-		case <-time.After(time.Second * 2): // 设置超时时间为2秒
+		case data := <-responceChan:
+			c.JSON(http.StatusOK, gin.H{"botResponce": data})
+		case <-time.After(time.Second * 5): // 设置超时时间为5秒
 			c.JSON(http.StatusOK, gin.H{"botResponce": "Gpt Operation Timed Out"})
 		}
 	})
