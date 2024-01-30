@@ -313,7 +313,9 @@ func initSession(engine *gin.Engine) {
 }
 
 func initSource(engine *gin.Engine) {
-	engine.LoadHTMLGlob("../templates/*")
+	engine.Static("/css", "../templates/css")
+	engine.Static("/js", "../templates/js")
+	engine.LoadHTMLGlob("../templates/*.html")
 }
 
 func initRouter(engine *gin.Engine) {
@@ -323,6 +325,8 @@ func initRouter(engine *gin.Engine) {
 	//首页
 	engine.GET("/", savePrePage, func(c *gin.Context) {
 		fmt.Println("hello world")
+		//TODO: 设计一个首页
+		c.Redirect(http.StatusTemporaryRedirect, loginPath)
 	})
 
 	//登陆注册
@@ -330,6 +334,7 @@ func initRouter(engine *gin.Engine) {
 	setRegisteInGroup(engine)
 	engine.GET("/logout", func(c *gin.Context) {
 		removeSessionVal("userKey", c)
+		c.Redirect(http.StatusTemporaryRedirect, loginPath)
 	})
 	engine.GET("/backPage", backPage)
 
