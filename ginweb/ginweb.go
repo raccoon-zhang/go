@@ -36,7 +36,7 @@ func init() {
 	redisCtx = context.Background()
 }
 
-func savePrePage(c *gin.Context) {
+func savePage(c *gin.Context) {
 	//其他的中间件执行完毕之后再更新当前页面，否则不更新
 	c.Next()
 	setSessionVal("prepage", c.Request.URL.Path, c)
@@ -49,13 +49,13 @@ func mustLogin(c *gin.Context) {
 	}
 }
 
-func sessionCheck(c *gin.Context) {
+func loginStatus(c *gin.Context) {
 	//这里用来设置之后需要添加的右上角登陆状态
 	id := sessions.Default(c).Get("userKey")
 	if id == nil {
-		//没有登陆
+		c.JSON(http.StatusOK, gin.H{"isLogin": "false"})
 	} else {
-		//已经登陆
+		c.JSON(http.StatusOK, gin.H{"isLogin": "true"})
 	}
 }
 
@@ -72,11 +72,7 @@ func removeSessionVal(key any, c *gin.Context) {
 }
 
 func redisloginCheck(name, password string, c *gin.Context) bool {
-	rdbRead := pool.NewRedisCliForRead(&redis.Options{
-		Addr:     "localhost:6380",
-		Password: "",
-		DB:       0,
-	})
+	rdbRead := pool.NewRedisCliForRead()
 
 	defer func() {
 		pool.DeleteRedisCli(rdbRead)
@@ -161,7 +157,7 @@ func getPrePageUrl(c *gin.Context) string {
 	return url
 }
 
-// 给前端用的，至于延迟多少时间前端自己设置，后端不处理
+// 给前端用的，至于延迟多少时间前端自己设置，后端不处理，这里指返回之前保存的页面
 func backPage(c *gin.Context) {
 	var url = getPrePageUrl(c)
 	c.JSON(http.StatusOK, gin.H{"prepage": url})
@@ -192,9 +188,9 @@ func setRegisteInGroup(engine *gin.Engine) {
 	registeGroup.POST("/", registeUser)
 }
 
-func setChatGrop(engine *gin.Engine) {
+func setChatGroup(engine *gin.Engine) {
 	chatGroup := engine.Group(chatPath, mustLogin)
-	chatGroup.GET("/", savePrePage, func(c *gin.Context) {
+	chatGroup.GET("/", savePage, func(c *gin.Context) {
 		c.HTML(http.StatusOK, "chat.html", "")
 	})
 	chatGroup.POST("/queryGpt", func(c *gin.Context) {
@@ -313,20 +309,17 @@ func initSession(engine *gin.Engine) {
 }
 
 func initSource(engine *gin.Engine) {
-	engine.Static("/css", "../templates/css")
-	engine.Static("/js", "../templates/js")
+	engine.Static("/static", "../templates")
 	engine.LoadHTMLGlob("../templates/*.html")
 }
 
 func initRouter(engine *gin.Engine) {
-	//保存之前访问的页面，用于重复登陆返回页面,这里要先检查是否登陆在保存页面
-	engine.Use(sessionCheck)
-
+	//--------------------页面渲染---------------------------
 	//首页
-	engine.GET("/", savePrePage, func(c *gin.Context) {
+	engine.GET("/", savePage, func(c *gin.Context) {
 		fmt.Println("hello world")
-		//TODO: 设计一个首页
-		c.Redirect(http.StatusTemporaryRedirect, loginPath)
+		//TODO: 设计一个首页,暂时使用聊天页面代替
+		c.Redirect(http.StatusTemporaryRedirect, chatPath)
 	})
 
 	//登陆注册
@@ -336,8 +329,16 @@ func initRouter(engine *gin.Engine) {
 		removeSessionVal("userKey", c)
 		c.Redirect(http.StatusTemporaryRedirect, loginPath)
 	})
-	engine.GET("/backPage", backPage)
 
 	//聊天页
-	setChatGrop(engine)
+	setChatGroup(engine)
+	//------------------------------------------------------
+
+	//--------------------问询接口---------------------------
+	//前页面查询
+	engine.GET("/backPage", backPage)
+
+	//登陆状态检查
+	engine.GET("/loginStatus", loginStatus)
+	//------------------------------------------------------
 }

@@ -1,0 +1,13 @@
+.user_status {
+    position: absolute;
+    max-width: 100px;
+    top: 0px;
+    right: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .user_status button {
+    margin-left: 10px;
+    width: 80px;
+  }

@@ -84,7 +84,7 @@ func (pool Pool) NewRedisCliForWrite() *redis.Client {
 	return client
 }
 
-func (pool Pool) NewRedisCliForRead(ops *redis.Options) *redis.ClusterClient {
+func (pool Pool) NewRedisCliForRead() *redis.ClusterClient {
 	// 创建Redis哨兵客户端实例
 	client := redis.NewFailoverClusterClient(&redis.FailoverOptions{
 		MasterName:    pool.failoverOps.MasterName,    // 主节点的名称
