@@ -332,6 +332,11 @@ func initRouter(engine *gin.Engine) {
 
 	//聊天页
 	setChatGroup(engine)
+
+	//404页面
+	engine.NoRoute(func(c *gin.Context) {
+		c.HTML(http.StatusNotFound, "404.html", gin.H{"domain": "127.0.0.1:8080"})
+	})
 	//------------------------------------------------------
 
 	//--------------------问询接口---------------------------
