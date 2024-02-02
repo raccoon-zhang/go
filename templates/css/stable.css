@@ -7,7 +7,22 @@
     justify-content: flex-end;
   }
   
+  .login_button {
+    margin-top: 50px;
+    width: 60%;
+    height: 30px;
+    border-radius: 10px;
+    border: 0;
+    color: #fff;
+    text-align: center;
+    line-height: 30px;
+    font-size: 15px;
+    background-image: linear-gradient(to right, #30cfd0, #330867);
+  }
+
   .user_status button {
-    margin-left: 10px;
-    width: 80px;
+    margin-top: 0px;
+    width: auto;
+    font-size: small;
+    background-image: linear-gradient(to right, #30cfd0, #330867);
   }

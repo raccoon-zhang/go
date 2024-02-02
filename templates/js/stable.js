@@ -15,6 +15,7 @@ function addStableItem(loginStatus) {
     if (loginStatus == "true") {
         // 创建 <button> 元素
         var buttonElement = document.createElement("button");
+        buttonElement.className = "login_button"
 
         // 将 <button> 元素添加到 <div> 元素中
         divElement.appendChild(buttonElement);
@@ -23,20 +24,48 @@ function addStableItem(loginStatus) {
             window.location.href="/logout"
         })
     } else {
-        // 创建 <button> 元素
-        var buttonElement = document.createElement("button");
-        // 将 <button> 元素添加到 <div> 元素中
-        divElement.appendChild(buttonElement);
-        buttonElement.innerText = "登陆"
-        buttonElement.addEventListener("click", function() {
-            window.location.href="/login"
-        })
-        buttonElement = document.createElement("button");
-        divElement.appendChild(buttonElement)
-        buttonElement.innerText = "注册"
-        buttonElement.addEventListener("click", function() {
-            window.location.href="/registe"
-        })
+        var currentURL = window.location.href;
+        var parts = currentURL.split('/');
+        var lastPart = parts[parts.length - 2];
+
+        if (lastPart == "login") {
+            var buttonElement = document.createElement("button");
+            buttonElement.className = "login_button"
+
+            // 将 <button> 元素添加到 <div> 元素中
+            divElement.appendChild(buttonElement);
+            buttonElement.innerText = "注册"
+            buttonElement.addEventListener("click", function() {
+                window.location.href="/registe"
+            })
+        } else if (lastPart == "registe") {
+            var buttonElement = document.createElement("button");
+            buttonElement.className = "login_button"
+
+            // 将 <button> 元素添加到 <div> 元素中
+            divElement.appendChild(buttonElement);
+            buttonElement.innerText = "登陆"
+            buttonElement.addEventListener("click", function() {
+                window.location.href="/login"
+            })
+        } else {
+            // 创建 <button> 元素
+            var buttonElement = document.createElement("button");
+            buttonElement.className = "login_button"
+            // 将 <button> 元素添加到 <div> 元素中
+            divElement.appendChild(buttonElement);
+            buttonElement.innerText = "登陆"
+            buttonElement.addEventListener("click", function() {
+                window.location.href="/login"
+            })
+            buttonElement = document.createElement("button");
+            buttonElement.className = "login_button"
+            divElement.appendChild(buttonElement)
+            buttonElement.innerText = "注册"
+            buttonElement.addEventListener("click", function() {
+                window.location.href="/registe"
+            })
+        }
     }
     document.body.appendChild(divElement);
 }
@@ -44,3 +73,11 @@ function addStableItem(loginStatus) {
 document.addEventListener("DOMContentLoaded", function(event){
     queryLoginStatus()
 })
+
+document.addEventListener('DOMContentLoaded', function() {
+    var link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/x-icon';
+    link.href = '/static/favicon.ico';
+    document.head.appendChild(link);
+  });
