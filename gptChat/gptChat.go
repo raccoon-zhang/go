@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"strings"
 )
 
 //url及参数信息详见：https://github.com/bluoruo/go-gtp3.5
@@ -49,7 +51,18 @@ type responceInfo struct {
 	}
 }
 
-var gptUrl = "https://api.openai.com/v1/chat/completions"
+var gptUrl string
+var apiKey string
+
+func init() {
+	gptUrl = "https://api.openai.com/v1/chat/completions"
+	content, err := os.ReadFile("../apiKey")
+	if err != nil {
+		fmt.Print("get apiKey err:", err)
+	}
+	//防止apiKey末尾有换行符
+	apiKey = strings.TrimRight(string(content), "\n")
+}
 
 func (defaultReqInfo *RequestInfo) setDefatuReqInfo() {
 	defaultReqInfo.Model = "gpt-3.5-turbo"
@@ -75,7 +88,14 @@ func QueryGpt(userMsg string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	responce, err := http.Post(gptUrl, "application/json", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", gptUrl, bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Println("create req wrong:", err)
+		return nil, err
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
+	client := &http.Client{}
+	responce, err := client.Do(req)
 
 	if err != nil {
 		return nil, err
@@ -84,7 +104,7 @@ func QueryGpt(userMsg string) (interface{}, error) {
 		responceBody, err := io.ReadAll(responce.Body)
 		if err != nil || responce.StatusCode != http.StatusOK {
 			fmt.Println("err:", err)
-			fmt.Println("responceBody:", responceBody)
+			fmt.Println("responceBody:", string(responceBody))
 			return nil, errors.New("read responceBody wrong")
 		} else {
 			var responceJsonData responceInfo
