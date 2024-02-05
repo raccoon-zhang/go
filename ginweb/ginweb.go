@@ -7,6 +7,7 @@ import (
 	"local/dbPool"
 	"local/tools"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gin-contrib/sessions"
@@ -21,6 +22,7 @@ const chatPath string = "/chat"
 
 var pool *dbPool.Pool
 var redisCtx context.Context
+var gptClients sync.Map
 
 func init() {
 	var err error
@@ -197,13 +199,23 @@ func setChatGroup(engine *gin.Engine) {
 		msg := c.PostForm("userMessage")
 		responceChan := make(chan interface{})
 		go func() {
-			data, err := gptChat.QueryGpt(msg)
-			if err != nil {
-				fmt.Println(err)
-				responceChan <- "something wrong, not your fault"
+			var client interface{}
+			if value, ok := gptClients.Load(sessions.Default(c).Get("userKey")); !ok {
+				client = gptChat.DefaultClient()
+				gptClients.Store(sessions.Default(c).Get("userKey"), client)
 			} else {
-				responceChan <- data
-				fmt.Println(data)
+				client = value
+			}
+			fmt.Println(client)
+			if cli, ok := client.(gptChat.LocalClient); ok {
+				data, err := cli.QueryGpt(msg)
+				if err != nil {
+					fmt.Println(err)
+					responceChan <- "something wrong, not your fault"
+				} else {
+					responceChan <- data
+					fmt.Println(data)
+				}
 			}
 			defer close(responceChan)
 		}()
@@ -211,7 +223,7 @@ func setChatGroup(engine *gin.Engine) {
 		select {
 		case data := <-responceChan:
 			c.JSON(http.StatusOK, gin.H{"botResponce": data})
-		case <-time.After(time.Second * 5): // 设置超时时间为5秒
+		case <-time.After(time.Second * 30): // 设置超时时间为30秒
 			c.JSON(http.StatusOK, gin.H{"botResponce": "Gpt Operation Timed Out"})
 		}
 	})

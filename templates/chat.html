@@ -9,16 +9,14 @@
 <body>
     <div class="container">
         <div class="chat-container">
-            <div class="chat-item">
-            <div class="message bot-message bot-chat-item">Hello! How can I assist you today?</div>
-            </div>
         </div>
         <div class="input-container">
-            <input type="text" id="message-input" placeholder="Type your message..." />
+            <textarea type="text" id="message-input" placeholder="Type your message..." ></textarea>
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
     <script src="/static/js/stable.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/showdown@1.9.0/dist/showdown.min.js"></script>
     <script>
         function genereteMessageElem(message, sender) {
             var element = document.createElement('div')
@@ -31,7 +29,13 @@
             } else {
                 innerElement.classList.add('bot-chat-item','bot-message')
             }
-            innerElement.innerText = message
+            //创建实例
+            var converter = new showdown.Converter();
+ 
+            //进行转换
+            var html = converter.makeHtml(message);
+
+            innerElement.innerHTML = html
 
             element.appendChild(innerElement)
 
@@ -45,6 +49,7 @@
             if (message) {
                 var messageElement = genereteMessageElem(message, "user")
                 chatContainer.appendChild(messageElement);
+                chatContainer.scrollTop = chatContainer.scrollHeight
                 messageInput.value = ''
             } else {
                 return
@@ -60,6 +65,7 @@
                     var botMSg = data["botResponce"]
                     botElement = genereteMessageElem(botMSg, "bot")
                     chatContainer.appendChild(botElement)
+                    chatContainer.scrollTop = chatContainer.scrollHeight
                 })
             })
         }
