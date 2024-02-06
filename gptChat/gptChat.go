@@ -12,7 +12,7 @@ import (
 
 type LocalClient struct {
 	client    *openai.Client
-	compleReq openai.ChatCompletionRequest
+	compleReq *openai.ChatCompletionRequest
 	mtx       *sync.Mutex
 }
 
@@ -33,7 +33,7 @@ func init() {
 func DefaultClient() LocalClient {
 	return LocalClient{
 		client: openai.NewClientWithConfig(defaultGptConfig),
-		compleReq: openai.ChatCompletionRequest{
+		compleReq: &openai.ChatCompletionRequest{
 			Model:    openai.GPT3Dot5Turbo,
 			Messages: make([]openai.ChatCompletionMessage, 0),
 		},
@@ -41,24 +41,33 @@ func DefaultClient() LocalClient {
 	}
 }
 
-func (c *LocalClient) AddMsg(userMsg string) {
+func (c *LocalClient) addMsg(info interface{}) {
 	c.mtx.Lock()
-	c.compleReq.Messages = append(c.compleReq.Messages, openai.ChatCompletionMessage{
-		Role:    openai.ChatMessageRoleUser,
-		Content: userMsg,
-	})
+	if value, ok := info.(string); ok {
+		c.compleReq.Messages = append(c.compleReq.Messages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: value,
+		})
+	}
+	if value, ok := info.(openai.ChatCompletionMessage); ok {
+		c.compleReq.Messages = append(c.compleReq.Messages, value)
+	}
 	c.mtx.Unlock()
 }
 
-func (c LocalClient) QueryGpt(userMsg string) (interface{}, error) {
-	c.AddMsg(userMsg)
+func (c *LocalClient) QueryGpt(userMsg string) (interface{}, error) {
+	c.addMsg(userMsg)
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
-		c.compleReq,
+		*c.compleReq,
 	)
 	if err != nil {
 		fmt.Printf("ChatCompletion error: %v\n", err)
 		return nil, err
 	}
+	//记录聊天信息，用于连续对话
+	//tips:理论上这样挺占内存的，考虑一下本地缓存做一下，但是磁盘存取效率有点低，需要做一下取舍。
+	// - 现在就直接放内存了
+	c.addMsg(resp.Choices[0].Message)
 	return resp.Choices[0].Message.Content, nil
 }

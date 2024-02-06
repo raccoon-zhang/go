@@ -197,7 +197,7 @@ func setChatGroup(engine *gin.Engine) {
 	})
 	chatGroup.POST("/queryGpt", func(c *gin.Context) {
 		msg := c.PostForm("userMessage")
-		responceChan := make(chan interface{})
+		responseChan := make(chan interface{})
 		go func() {
 			var client interface{}
 			if value, ok := gptClients.Load(sessions.Default(c).Get("userKey")); !ok {
@@ -206,22 +206,21 @@ func setChatGroup(engine *gin.Engine) {
 			} else {
 				client = value
 			}
-			fmt.Println(client)
 			if cli, ok := client.(gptChat.LocalClient); ok {
 				data, err := cli.QueryGpt(msg)
 				if err != nil {
 					fmt.Println(err)
-					responceChan <- "something wrong, not your fault"
+					responseChan <- "something wrong, not your fault"
 				} else {
-					responceChan <- data
+					responseChan <- data
 					fmt.Println(data)
 				}
 			}
-			defer close(responceChan)
+			defer close(responseChan)
 		}()
 
 		select {
-		case data := <-responceChan:
+		case data := <-responseChan:
 			c.JSON(http.StatusOK, gin.H{"botResponce": data})
 		case <-time.After(time.Second * 30): // 设置超时时间为30秒
 			c.JSON(http.StatusOK, gin.H{"botResponce": "Gpt Operation Timed Out"})
