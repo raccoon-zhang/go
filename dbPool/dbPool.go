@@ -33,7 +33,7 @@ func InitPool(driver, dsn string, ops *redis.FailoverOptions, size int) (*Pool, 
 	return pool, nil
 }
 
-func (pool Pool) NewDb() (db *sql.DB, err error) {
+func (pool *Pool) NewDb() (db *sql.DB, err error) {
 	pool.freePool.Range(func(key, value any) bool {
 		if db == nil {
 			db, _ = value.(*sql.DB)
@@ -49,7 +49,7 @@ func (pool Pool) NewDb() (db *sql.DB, err error) {
 		return nil, errors.New("no db is free")
 	}
 }
-func (pool Pool) DeleteDb(db *sql.DB) {
+func (pool *Pool) DeleteDb(db *sql.DB) {
 	if pool.isDestroyed {
 		db.Close()
 		return
@@ -58,7 +58,7 @@ func (pool Pool) DeleteDb(db *sql.DB) {
 	pool.freePool.Store(db, db)
 }
 
-func (pool Pool) DestroyPool() {
+func (pool *Pool) DestroyPool() {
 	pool.busyPool.Range(func(key, value any) bool {
 		db, ok := value.(*sql.DB)
 		if ok {
@@ -78,13 +78,13 @@ func (pool Pool) DestroyPool() {
 	pool.isDestroyed = true
 }
 
-func (pool Pool) NewRedisCliForWrite() *redis.Client {
+func (pool *Pool) NewRedisCliForWrite() *redis.Client {
 	//获取主节点用于写操作
 	client := redis.NewFailoverClient(pool.failoverOps)
 	return client
 }
 
-func (pool Pool) NewRedisCliForRead() *redis.ClusterClient {
+func (pool *Pool) NewRedisCliForRead() *redis.ClusterClient {
 	// 创建Redis哨兵客户端实例
 	client := redis.NewFailoverClusterClient(&redis.FailoverOptions{
 		MasterName:    pool.failoverOps.MasterName,    // 主节点的名称
@@ -94,7 +94,7 @@ func (pool Pool) NewRedisCliForRead() *redis.ClusterClient {
 	return client
 }
 
-func (pool Pool) DeleteRedisCli(cli any) {
+func (pool *Pool) DeleteRedisCli(cli any) {
 	if val, ok := cli.(*redis.Client); ok {
 		val.Close()
 	} else if val, ok := cli.(*redis.ClusterClient); ok {
