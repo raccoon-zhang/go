@@ -76,9 +76,7 @@ func removeSessionVal(key any, c *gin.Context) {
 func redisloginCheck(name, password string, c *gin.Context) bool {
 	rdbRead := pool.NewRedisCliForRead()
 
-	defer func() {
-		pool.DeleteRedisCli(rdbRead)
-	}()
+	defer pool.DeleteRedisCli(rdbRead)
 
 	passwordHash, err := rdbRead.Get(redisCtx, name).Result()
 	if err != nil {
@@ -97,9 +95,7 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 	if err != nil {
 		return false
 	}
-	defer func() {
-		pool.DeleteDb(db)
-	}()
+	defer pool.DeleteDb(db)
 	var sqlString = "select name,password from student where name = ?"
 	ret, err := db.Query(sqlString, name)
 	if err != nil {
@@ -113,9 +109,7 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 		if tools.PasswordDecrypt(passwordHash, password) {
 			setSessionVal("userKey", name, c)
 			rdbWrite := pool.NewRedisCliForWrite()
-			defer func() {
-				pool.DeleteRedisCli(rdbWrite)
-			}()
+			defer pool.DeleteRedisCli(rdbWrite)
 			err := rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
 			if err != nil {
 				fmt.Println(err)
@@ -260,9 +254,7 @@ func redisRegisteUser(name, password string) bool {
 		return false
 	}
 	rdbWrite := pool.NewRedisCliForWrite()
-	defer func() {
-		pool.DeleteRedisCli(rdbWrite)
-	}()
+	defer pool.DeleteRedisCli(rdbWrite)
 
 	err = rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
 	if err != nil {
@@ -288,9 +280,7 @@ func sqlRegisteUser(name, age, password string) bool {
 		return false
 	}
 
-	defer func() {
-		pool.DeleteDb(db)
-	}()
+	defer pool.DeleteDb(db)
 
 	stmt, err := db.Prepare("insert into student(name,age,password) values(?,?,?)")
 
