@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gptChat"
+	"io"
 	"local/dbPool"
 	"local/tools"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
+	"github.com/otiai10/gosseract/v2"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -219,6 +221,33 @@ func setChatGroup(engine *gin.Engine) {
 		case <-time.After(time.Second * 30): // 设置超时时间为30秒
 			c.JSON(http.StatusOK, gin.H{"botResponce": "Gpt Operation Timed Out"})
 		}
+	})
+
+	chatGroup.POST("/ocr", func(c *gin.Context) {
+		image, err := c.FormFile("image")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		imageReader, err := image.Open()
+		defer imageReader.Close()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		imageData, err := io.ReadAll(imageReader)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		ocrCli := gosseract.NewClient()
+		defer ocrCli.Close()
+		//支持中英文文字提取
+		ocrCli.SetLanguage("eng", "chi_sim")
+		ocrCli.SetImageFromBytes(imageData)
+		text, _ := ocrCli.Text()
+		c.JSON(http.StatusOK, gin.H{"text": text})
 	})
 }
 
