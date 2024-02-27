@@ -19,7 +19,7 @@ import (
 )
 
 const loginPath string = "/login"
-const registePath string = "/registe"
+const registerPath string = "/register"
 const chatPath string = "/chat"
 
 var pool *dbPool.Pool
@@ -178,12 +178,12 @@ func setLogInGroup(engine *gin.Engine) {
 	loginGroup.POST("/", loginCheck)
 }
 
-func setRegisteInGroup(engine *gin.Engine) {
-	registeGroup := engine.Group(registePath)
-	registeGroup.GET("/", multiLoginCheck, func(c *gin.Context) {
-		c.HTML(http.StatusOK, "registe.html", "")
+func setRegisterInGroup(engine *gin.Engine) {
+	registerGroup := engine.Group(registerPath)
+	registerGroup.GET("/", multiLoginCheck, func(c *gin.Context) {
+		c.HTML(http.StatusOK, "register.html", "")
 	})
-	registeGroup.POST("/", registeUser)
+	registerGroup.POST("/", registerUser)
 }
 
 func setChatGroup(engine *gin.Engine) {
@@ -256,7 +256,7 @@ func setChatGroup(engine *gin.Engine) {
 	})
 }
 
-func registeUser(c *gin.Context) {
+func registerUser(c *gin.Context) {
 	var name string
 	var password string
 	var age string
@@ -275,13 +275,13 @@ func registeUser(c *gin.Context) {
 		}
 	}()
 
-	if sqlRegisteUser(name, age, password) {
-		redisRegisteUser(name, password)
+	if sqlRegisterUser(name, age, password) {
+		redisRegisterUser(name, password)
 		isPass = true
 	}
 }
 
-func redisRegisteUser(name, password string) bool {
+func redisRegisterUser(name, password string) bool {
 	passwordHash, err := tools.PasswordEncrypt(password)
 	if err != nil {
 		fmt.Println(err)
@@ -299,7 +299,7 @@ func redisRegisteUser(name, password string) bool {
 	}
 }
 
-func sqlRegisteUser(name, age, password string) bool {
+func sqlRegisterUser(name, age, password string) bool {
 	passwordHash, err := tools.PasswordEncrypt(password)
 
 	if err != nil {
@@ -359,7 +359,7 @@ func initRouter(engine *gin.Engine) {
 
 	//登陆注册
 	setLogInGroup(engine)
-	setRegisteInGroup(engine)
+	setRegisterInGroup(engine)
 	engine.GET("/logout", func(c *gin.Context) {
 		removeSessionVal("userKey", c)
 		c.Redirect(http.StatusTemporaryRedirect, loginPath)

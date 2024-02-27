@@ -36,9 +36,9 @@ function addStableItem(loginStatus) {
             divElement.appendChild(buttonElement);
             buttonElement.innerText = "注册"
             buttonElement.addEventListener("click", function() {
-                window.location.href="/registe"
+                window.location.href="/register"
             })
-        } else if (lastPart == "registe") {
+        } else if (lastPart == "register") {
             var buttonElement = document.createElement("button");
             buttonElement.className = "login_button"
 
@@ -63,7 +63,7 @@ function addStableItem(loginStatus) {
             divElement.appendChild(buttonElement)
             buttonElement.innerText = "注册"
             buttonElement.addEventListener("click", function() {
-                window.location.href="/registe"
+                window.location.href="/register"
             })
         }
     }
