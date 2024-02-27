@@ -26,6 +26,7 @@
             // 创建一个隐藏的文件选择input元素
             var fileInput = document.createElement('input');
             fileInput.type = 'file';
+            fileInput.accept = 'image/*';
   
             // 添加change事件监听器，当文件选择后触发回调
             fileInput.addEventListener('change', function(event) {
