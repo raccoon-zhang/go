@@ -33,7 +33,7 @@ func init() {
 		SentinelAddrs: []string{"localhost:26379", "localhost:26380"},
 	}
 
-	pool, err = dbPool.InitPool("mysql", "root:@/school", falioverOps, 10)
+	pool, err = dbPool.InitPool("mysql", "root:@/gptweb", falioverOps, 10)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -98,7 +98,7 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 		return false
 	}
 	defer pool.DeleteDb(db)
-	var sqlString = "select name,password from student where name = ?"
+	var sqlString = "select name,password from user where name = ?"
 	ret, err := db.Query(sqlString, name)
 	if err != nil {
 		fmt.Println(err)
@@ -316,7 +316,7 @@ func sqlRegisterUser(name, age, password string) bool {
 
 	defer pool.DeleteDb(db)
 
-	stmt, err := db.Prepare("insert into student(name,age,password) values(?,?,?)")
+	stmt, err := db.Prepare("insert into user(name,age,password) values(?,?,?)")
 
 	if err != nil {
 		fmt.Println(err)
