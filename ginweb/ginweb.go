@@ -241,10 +241,15 @@ func setChatGroup(engine *gin.Engine) {
 			fmt.Println(err)
 			return
 		}
+		langs, err := gosseract.GetAvailableLanguages()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		ocrCli := gosseract.NewClient()
 		defer ocrCli.Close()
-		//支持中英文文字提取
-		ocrCli.SetLanguage("eng", "chi_sim")
+		//将现有语言支持都加入
+		ocrCli.SetLanguage(langs...)
 		ocrCli.SetImageFromBytes(imageData)
 		text, _ := ocrCli.Text()
 		c.JSON(http.StatusOK, gin.H{"text": text})
