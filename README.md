@@ -2,9 +2,11 @@
 
 > 可以正常连接代理gpt
 > 
-> 注册登陆功能完善
+> 注册登陆功能
 > 
-> redis登陆校验功能添加
+> redis登陆校验功能，redis采用一主二从模式
+> 
+> ocr图片文字提取功能（可能gpt4会做的更好，但目前先用ocr代替，ocr环境需要自己配置),语言包： [Traineddata Files](https://github.com/tesseract-ocr/tesseract/wiki/Data-Files)
 
 # 使用
 
