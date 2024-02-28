@@ -230,12 +230,11 @@ func setChatGroup(engine *gin.Engine) {
 			return
 		}
 		imageReader, err := image.Open()
-		defer imageReader.Close()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-
+		defer imageReader.Close()
 		imageData, err := io.ReadAll(imageReader)
 		if err != nil {
 			fmt.Println(err)
