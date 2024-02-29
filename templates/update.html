@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/register.css">
+  <link rel="stylesheet" href="/static/css/stable.css">
+  <title>Register</title>
+</head>
+
+<body>
+  <div id="register_box">
+
+    <h2>UPDATE</h2>
+    <form id="register_form">
+      <div id="input_box">
+        <input type="text" id="name" placeholder="请输入用户名">
+      </div>
+      <div class="input_box">
+        <input type="text" id="age" placeholder="年龄">
+      </div>
+      <div class="input_box">
+        <input type="password" id="old_password" placeholder="旧密码" required>
+      </div>
+      <div class="input_box">
+        <input type="password" id="password" placeholder="请输入新密码">
+      </div>
+      <div class="input_box">
+        <input type="password" id="repeat_password" placeholder="请再输入一次新密码">
+        <span id="password_check" hidden="true"></span>
+      </div>
+      <button class="login_button" type="submit" id="register">更新</button><br>
+    </form>
+  </div>
+  <script src="/static/js/stable.js"></script>
+  <script>
+    window.onload = function() {
+      fetch("/userInfo", {
+          method:"GET"
+      }).then(function(response) {
+          response.json().then(function(data) {
+            document.getElementById("name").value = data.name
+            document.getElementById("age").value = data.age
+          })
+      })
+
+      document.getElementById("register_form").addEventListener("submit", function(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+
+        var name = document.getElementById("name").value;
+        var oldPassword = document.getElementById("old_password").value
+        var password = document.getElementById("password").value;
+        var repeatPassword = document.getElementById("repeat_password").value
+        var age = document.getElementById("age").value
+
+        if (name == "" && password == "" && repeatPassword == "" && age == "") {
+          var item = document.getElementById("password_check")
+          item.innerText = "没有需要修改的内容"
+          item.hidden = false
+          return
+        }
+     
+        if (repeatPassword != password) {
+          var item = document.getElementById("password_check")
+          item.innerText = "密码输入不一致"
+          item.hidden = false
+          return
+        }
+    
+        //POST URL
+        var url = "/update";
+        var formData = new FormData();
+        if (oldPassword != null) {
+          formData.append("oldPassword", oldPassword)
+        }
+        if (name != null) {
+          formData.append("name", name);
+        }
+        if (age != null) {
+          formData.append("age", age)
+        }
+        if (password != null) {
+          formData.append("password", password);
+        }
+
+        // 发送请求到后端
+        // 可以使用fetch、XMLHttpRequest等方法发送请求
+        // 以下示例使用fetch发送POST请求
+        fetch(url, {
+          method: "POST",
+          body: formData
+        })
+        .then(function(response) {
+          // 处理响应
+          response.json().then(function(data) {
+            var item = document.getElementById("password_check")
+            item.hidden = false
+            if (data.status == "true") {
+              console.log("success")
+              item.innerText = "修改成功"
+            } else {
+              item.innerText = "修改失败"
+              console.log("false")
+            }
+          })
+        })
+        .catch(function(error) {
+          // 处理错误
+        });
+      });
+    };
+  </script>
+</body>
+
+</html>
+
+

@@ -23,6 +23,16 @@ function addStableItem(loginStatus) {
         buttonElement.addEventListener("click", function() {
             window.location.href="/logout"
         })
+
+        buttonElement = document.createElement("button");
+        buttonElement.className = "login_button"
+
+        // 将 <button> 元素添加到 <div> 元素中
+        divElement.appendChild(buttonElement);
+        buttonElement.innerText = "更新"
+        buttonElement.addEventListener("click", function() {
+            window.location.href="/update"
+        })
     } else {
         var currentURL = window.location.href;
         var parts = currentURL.split('/');

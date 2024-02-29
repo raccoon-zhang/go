@@ -20,6 +20,7 @@ import (
 
 const loginPath string = "/login"
 const registerPath string = "/register"
+const updatePath string = "/update"
 const chatPath string = "/chat"
 
 var pool *dbPool.Pool
@@ -147,6 +148,71 @@ func loginCheck(c *gin.Context) {
 	}
 }
 
+func updateUser(c *gin.Context) {
+	updateOk := false
+	preName, ok := sessions.Default(c).Get("userKey").(string)
+	if !ok {
+		return
+	}
+
+	var name, age, password string
+	defer func() {
+		if updateOk {
+			//更新redis缓存并推出登陆
+			cli := pool.NewRedisCliForWrite()
+			cli.Del(redisCtx, preName)
+			cli.Set(redisCtx, name, password, time.Hour*24)
+			pool.DeleteRedisCli(cli)
+			c.JSON(http.StatusOK, gin.H{"status": "true"})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"status": "false"})
+		}
+	}()
+
+	cli, err := pool.NewDb()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	ret, err := cli.Query("select name,age,password from user where name = ?", preName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer pool.DeleteDb(cli)
+
+	for ret.Next() {
+		ret.Scan(&name, &age, &password)
+		if c.PostForm("name") != "" {
+			name = c.PostForm("name")
+		}
+
+		if c.PostForm("age") != "" {
+			age = c.PostForm("age")
+		}
+
+		if c.PostForm("password") != "" {
+			//检查旧密码是否正确
+			oldPwd := c.PostForm("oldPassword")
+			if !tools.PasswordDecrypt(password, oldPwd) {
+				return
+			}
+			passwordHash, err := tools.PasswordEncrypt(c.PostForm("password"))
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			password = passwordHash
+		}
+	}
+
+	_, err = cli.Exec("update user set name=?,age=?,password=? where name=?", name, age, password, preName)
+	if err == nil {
+		updateOk = true
+	}
+}
+
 func getPrePageUrl(c *gin.Context) string {
 	var url, ok = sessions.Default(c).Get("prepage").(string)
 	if !ok {
@@ -184,6 +250,14 @@ func setRegisterInGroup(engine *gin.Engine) {
 		c.HTML(http.StatusOK, "register.html", "")
 	})
 	registerGroup.POST("/", registerUser)
+}
+
+func setUpdateGroup(engin *gin.Engine) {
+	updateGroup := engin.Group(updatePath)
+	updateGroup.GET("/", mustLogin, func(c *gin.Context) {
+		c.HTML(http.StatusOK, "update.html", "")
+	})
+	updateGroup.POST("/", updateUser)
 }
 
 func setChatGroup(engine *gin.Engine) {
@@ -355,10 +429,37 @@ func initRouter(engine *gin.Engine) {
 		//TODO: 设计一个首页,暂时使用聊天页面代替
 		c.Redirect(http.StatusTemporaryRedirect, chatPath)
 	})
+	engine.GET("/userInfo", mustLogin, func(c *gin.Context) {
+		var name, age string
+		name, ok := sessions.Default(c).Get("userKey").(string)
+		if !ok {
+			fmt.Println("sessions 错误")
+			return
+		}
+		cli, err := pool.NewDb()
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer pool.DeleteDb(cli)
+
+		ret, err := cli.Query("select name,age from user where name=?", name)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		for ret.Next() {
+			ret.Scan(&name, &age)
+		}
+
+		c.JSON(http.StatusOK, gin.H{"name": name, "age": age})
+	})
 
 	//登陆注册
 	setLogInGroup(engine)
 	setRegisterInGroup(engine)
+	setUpdateGroup(engine)
 	engine.GET("/logout", func(c *gin.Context) {
 		removeSessionVal("userKey", c)
 		c.Redirect(http.StatusTemporaryRedirect, loginPath)
