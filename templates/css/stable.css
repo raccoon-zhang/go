@@ -1,6 +1,6 @@
 .user_status {
     position: absolute;
-    max-width: 100px;
+    max-width: 200px;
     top: 0px;
     right: 10px;
     display: flex;

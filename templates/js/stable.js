@@ -12,6 +12,17 @@ function addStableItem(loginStatus) {
     var divElement = document.createElement("div");
     divElement.className = "user_status";
 
+    // 创建 <button> 元素
+    var buttonElement = document.createElement("button");
+    buttonElement.className = "login_button"
+
+    // 将 <button> 元素添加到 <div> 元素中
+    divElement.appendChild(buttonElement);
+    buttonElement.innerText = "聊天"
+    buttonElement.addEventListener("click", function() {
+        window.location.href="/chat"
+    })
+
     if (loginStatus == "true") {
         // 创建 <button> 元素
         var buttonElement = document.createElement("button");
