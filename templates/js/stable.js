@@ -14,7 +14,7 @@ function addStableItem(loginStatus) {
 
     // 创建 <button> 元素
     var buttonElement = document.createElement("button");
-    buttonElement.className = "login_button"
+    buttonElement.className = "button"
 
     // 将 <button> 元素添加到 <div> 元素中
     divElement.appendChild(buttonElement);
@@ -26,7 +26,7 @@ function addStableItem(loginStatus) {
     if (loginStatus == "true") {
         // 创建 <button> 元素
         var buttonElement = document.createElement("button");
-        buttonElement.className = "login_button"
+        buttonElement.className = "button"
 
         // 将 <button> 元素添加到 <div> 元素中
         divElement.appendChild(buttonElement);
@@ -36,11 +36,11 @@ function addStableItem(loginStatus) {
         })
 
         buttonElement = document.createElement("button");
-        buttonElement.className = "login_button"
+        buttonElement.className = "button"
 
         // 将 <button> 元素添加到 <div> 元素中
         divElement.appendChild(buttonElement);
-        buttonElement.innerText = "更新"
+        buttonElement.innerText = "个人信息"
         buttonElement.addEventListener("click", function() {
             window.location.href="/update"
         })
@@ -51,7 +51,7 @@ function addStableItem(loginStatus) {
 
         if (lastPart == "login") {
             var buttonElement = document.createElement("button");
-            buttonElement.className = "login_button"
+            buttonElement.className = "button"
 
             // 将 <button> 元素添加到 <div> 元素中
             divElement.appendChild(buttonElement);
@@ -61,7 +61,7 @@ function addStableItem(loginStatus) {
             })
         } else if (lastPart == "register") {
             var buttonElement = document.createElement("button");
-            buttonElement.className = "login_button"
+            buttonElement.className = "button"
 
             // 将 <button> 元素添加到 <div> 元素中
             divElement.appendChild(buttonElement);
@@ -72,7 +72,7 @@ function addStableItem(loginStatus) {
         } else {
             // 创建 <button> 元素
             var buttonElement = document.createElement("button");
-            buttonElement.className = "login_button"
+            buttonElement.className = "button"
             // 将 <button> 元素添加到 <div> 元素中
             divElement.appendChild(buttonElement);
             buttonElement.innerText = "登陆"
@@ -80,7 +80,7 @@ function addStableItem(loginStatus) {
                 window.location.href="/login"
             })
             buttonElement = document.createElement("button");
-            buttonElement.className = "login_button"
+            buttonElement.className = "button"
             divElement.appendChild(buttonElement)
             buttonElement.innerText = "注册"
             buttonElement.addEventListener("click", function() {

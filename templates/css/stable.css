@@ -22,9 +22,12 @@
 
   .user_status button {
     margin-top: 0px;
+    margin-right: 5px;
     width: auto;
     font-size: small;
-    background-image: linear-gradient(to right, #30cfd0, #330867);
+    border: 0;
+    border-radius: 5px;
+    background-image: linear-gradient(to right, #16a9a9, #16a9a9);
   }
 
   pre {
