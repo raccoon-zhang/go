@@ -20,9 +20,9 @@
         </div> 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked@7.0.5/marked.min.js"></script>
     <script src="/static/js/prism.js"></script>
     <script src="/static/js/stable.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/showdown@1.9.0/dist/showdown.min.js"></script>
     <script>
         function openFilePicker() {
             // 创建一个隐藏的文件选择input元素
@@ -63,32 +63,9 @@
             } else {
                 innerElement.classList.add('bot-chat-item','bot-message')
             }
-            // 使用正则表达式将代码块提取出来
-            var codeMatches = message.match(/```[\s\S]*?```/g);
 
-            if (codeMatches != null) {
-                // 遍历每个代码块
-                for (var i = 0; i < codeMatches.length; i++) {
-                    var codeBlock = codeMatches[i];
-
-                    // 获取代码类型
-                    var codeType = codeBlock.match(/```(\S+)\n/)[1] ? codeBlock.match(/```(\S+)\n/)[1] : null;
-
-                    //创建实例
-                    var converter = new showdown.Converter();
-        
-                    //进行转换
-                    var html = converter.makeHtml(codeBlock);
-                    // 创建新的代码块元素
-                    var codeElement = document.createElement("pre");
-                    codeElement.innerHTML = "<code class='language-" + codeType + "'>" + html + "</code>";
-
-                    // 替换文本中的代码块为代码块元素
-                    message = message.replace(codeBlock, codeElement.outerHTML);
-                }
-            }
-
-            innerElement.innerHTML = message
+            var markedHtml = marked.parse(message)
+            innerElement.innerHTML = markedHtml
 
             element.appendChild(innerElement)
 
