@@ -2,7 +2,7 @@ package gptChat
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 	"sync"
@@ -22,7 +22,7 @@ var defaultGptConfig openai.ClientConfig
 func init() {
 	content, err := os.ReadFile("../apiKey")
 	if err != nil {
-		fmt.Print("get apiKey err:", err)
+		slog.Error(err.Error())
 	}
 	//防止apiKey末尾有换行符
 	apiKey = strings.TrimRight(string(content), "\n")
@@ -62,7 +62,7 @@ func (c *LocalClient) QueryGpt(userMsg string) (interface{}, error) {
 		*c.compleReq,
 	)
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
+		slog.Error(err.Error())
 		return nil, err
 	}
 	//记录聊天信息，用于连续对话

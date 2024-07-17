@@ -3,7 +3,7 @@ package dbPool
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"log/slog"
 	"sync"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,7 +23,7 @@ func InitPool(driver, dsn string, ops *redis.FailoverOptions, size int) (*Pool, 
 	for count := 0; count < size; count++ {
 		db, err := sql.Open(driver, dsn)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			//清除所有的已经插入的数据
 			pool.freePool = sync.Map{}
 			return nil, errors.New("create error")
@@ -100,6 +100,6 @@ func (pool *Pool) DeleteRedisCli(cli any) {
 	} else if val, ok := cli.(*redis.ClusterClient); ok {
 		val.Close()
 	} else {
-		fmt.Println("you passed a wrong client")
+		slog.Warn("you passed a wrong client")
 	}
 }

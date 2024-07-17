@@ -2,11 +2,11 @@ package ginweb
 
 import (
 	"context"
-	"fmt"
 	"gptChat"
 	"io"
 	"local/dbPool"
 	"local/tools"
+	"log/slog"
 	"net/http"
 	"sync"
 	"time"
@@ -36,7 +36,7 @@ func init() {
 
 	pool, err = dbPool.InitPool("mysql", "root:@/gptweb", falioverOps, 10)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 	}
 	redisCtx = context.Background()
 }
@@ -83,7 +83,7 @@ func redisloginCheck(name, password string, c *gin.Context) bool {
 
 	passwordHash, err := rdbRead.Get(redisCtx, name).Result()
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	}
 	if tools.PasswordDecrypt(passwordHash, password) {
@@ -102,7 +102,7 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 	var sqlString = "select name,password from user where name = ?"
 	ret, err := db.Query(sqlString, name)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	}
 	for ret.Next() {
@@ -115,7 +115,7 @@ func sqlLoginCheck(name, password string, c *gin.Context) bool {
 			defer pool.DeleteRedisCli(rdbWrite)
 			err := rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
 			if err != nil {
-				fmt.Println(err)
+				slog.Error(err.Error())
 			}
 			return true
 		}
@@ -171,13 +171,13 @@ func updateUser(c *gin.Context) {
 
 	cli, err := pool.NewDb()
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return
 	}
 
 	ret, err := cli.Query("select name,age,password from user where name = ?", preName)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return
 	}
 	defer pool.DeleteDb(cli)
@@ -200,7 +200,7 @@ func updateUser(c *gin.Context) {
 			}
 			passwordHash, err := tools.PasswordEncrypt(c.PostForm("password"))
 			if err != nil {
-				fmt.Println(err)
+				slog.Error(err.Error())
 				return
 			}
 			password = passwordHash
@@ -279,11 +279,10 @@ func setChatGroup(engine *gin.Engine) {
 			if cli, ok := client.(gptChat.LocalClient); ok {
 				data, err := cli.QueryGpt(msg)
 				if err != nil {
-					fmt.Println(err)
+					slog.Error(err.Error())
 					responseChan <- "something wrong, not your fault"
 				} else {
 					responseChan <- data
-					fmt.Println(data)
 				}
 			}
 			defer close(responseChan)
@@ -291,6 +290,9 @@ func setChatGroup(engine *gin.Engine) {
 
 		select {
 		case data := <-responseChan:
+			if value, ok := data.(string); ok {
+				slog.Info(value)
+			}
 			c.JSON(http.StatusOK, gin.H{"botResponce": data})
 		case <-time.After(time.Second * 30): // 设置超时时间为30秒
 			c.JSON(http.StatusOK, gin.H{"botResponce": "Gpt Operation Timed Out"})
@@ -300,23 +302,23 @@ func setChatGroup(engine *gin.Engine) {
 	chatGroup.POST("/ocr", func(c *gin.Context) {
 		image, err := c.FormFile("image")
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			return
 		}
 		imageReader, err := image.Open()
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			return
 		}
 		defer imageReader.Close()
 		imageData, err := io.ReadAll(imageReader)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			return
 		}
 		langs, err := gosseract.GetAvailableLanguages()
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			return
 		}
 		ocrCli := gosseract.NewClient()
@@ -357,7 +359,7 @@ func registerUser(c *gin.Context) {
 func redisRegisterUser(name, password string) bool {
 	passwordHash, err := tools.PasswordEncrypt(password)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	}
 	rdbWrite := pool.NewRedisCliForWrite()
@@ -365,7 +367,7 @@ func redisRegisterUser(name, password string) bool {
 
 	err = rdbWrite.Set(redisCtx, name, passwordHash, time.Hour*24).Err()
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	} else {
 		return true
@@ -376,14 +378,14 @@ func sqlRegisterUser(name, age, password string) bool {
 	passwordHash, err := tools.PasswordEncrypt(password)
 
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	}
 
 	db, err := pool.NewDb()
 
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	}
 
@@ -392,13 +394,13 @@ func sqlRegisterUser(name, age, password string) bool {
 	stmt, err := db.Prepare("insert into user(name,age,password) values(?,?,?)")
 
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	}
 	_, err = stmt.Exec(name, age, passwordHash)
 
 	if err != nil {
-		fmt.Println(err)
+		slog.Error(err.Error())
 		return false
 	} else {
 		return true
@@ -421,11 +423,35 @@ func initSource(engine *gin.Engine) {
 	engine.LoadHTMLGlob("../templates/*.html")
 }
 
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//               佛祖保佑         永无BUG
+
 func initRouter(engine *gin.Engine) {
 	//--------------------页面渲染---------------------------
 	//首页
 	engine.GET("/", savePage, func(c *gin.Context) {
-		fmt.Println("hello world")
 		//TODO: 设计一个首页,暂时使用聊天页面代替
 		c.Redirect(http.StatusTemporaryRedirect, chatPath)
 	})
@@ -433,19 +459,19 @@ func initRouter(engine *gin.Engine) {
 		var name, age string
 		name, ok := sessions.Default(c).Get("userKey").(string)
 		if !ok {
-			fmt.Println("sessions 错误")
+			slog.Error("sessions 错误")
 			return
 		}
 		cli, err := pool.NewDb()
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 		}
 		defer pool.DeleteDb(cli)
 
 		ret, err := cli.Query("select name,age from user where name=?", name)
 
 		if err != nil {
-			fmt.Println(err)
+			slog.Error(err.Error())
 			return
 		}
 
