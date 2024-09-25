@@ -1,0 +1,6 @@
+framework module Pods_quickPaste_quickPasteUITests {
+  umbrella header "Pods-quickPaste-quickPasteUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}

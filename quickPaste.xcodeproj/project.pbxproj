@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0DA35C1278C7272520362183 /* Pods_quickPasteTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 488C615F4182CEADC7A288AC /* Pods_quickPasteTests.framework */; };
+		442D4B312CAA4DBD0050E437 /* CommonValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 442D4B302CAA4DBD0050E437 /* CommonValues.swift */; };
 		4451BC922CA3EEBD00287BF7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BC912CA3EEBD00287BF7 /* AppDelegate.swift */; };
 		4451BC942CA3EEBD00287BF7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BC932CA3EEBD00287BF7 /* ViewController.swift */; };
 		4451BC962CA3EEBE00287BF7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4451BC952CA3EEBE00287BF7 /* Assets.xcassets */; };
@@ -14,6 +16,12 @@
 		4451BCA42CA3EEBF00287BF7 /* quickPasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BCA32CA3EEBF00287BF7 /* quickPasteTests.swift */; };
 		4451BCAE2CA3EEBF00287BF7 /* quickPasteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BCAD2CA3EEBF00287BF7 /* quickPasteUITests.swift */; };
 		4451BCB02CA3EEBF00287BF7 /* quickPasteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BCAF2CA3EEBF00287BF7 /* quickPasteUITestsLaunchTests.swift */; };
+		4451BCBE2CA3EF9E00287BF7 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BCBD2CA3EF9E00287BF7 /* MainViewController.swift */; };
+		4451BCC02CA3F37D00287BF7 /* ClipBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4451BCBF2CA3F37D00287BF7 /* ClipBoard.swift */; };
+		44DB88532CA5776C0022BCEC /* prefixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DB88522CA5776C0022BCEC /* prefixView.swift */; };
+		44DB88562CA577E50022BCEC /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44DB88552CA577E50022BCEC /* Label.swift */; };
+		91F7343E94ECAE31CF54BF82 /* Pods_quickPaste.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 219D79EE685C48AA9C73C936 /* Pods_quickPaste.framework */; };
+		CB597C8012B3C1614621F008 /* Pods_quickPaste_quickPasteUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFCCEACA259D47CEB27EFC3 /* Pods_quickPaste_quickPasteUITests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +42,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1B590D136FD0AB0C91FACBF6 /* Pods-quickPaste-quickPasteUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPaste-quickPasteUITests.release.xcconfig"; path = "Target Support Files/Pods-quickPaste-quickPasteUITests/Pods-quickPaste-quickPasteUITests.release.xcconfig"; sourceTree = "<group>"; };
+		219D79EE685C48AA9C73C936 /* Pods_quickPaste.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_quickPaste.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		442D4B302CAA4DBD0050E437 /* CommonValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonValues.swift; sourceTree = "<group>"; };
 		4451BC8E2CA3EEBD00287BF7 /* quickPaste.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = quickPaste.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4451BC912CA3EEBD00287BF7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4451BC932CA3EEBD00287BF7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -45,6 +56,20 @@
 		4451BCA92CA3EEBF00287BF7 /* quickPasteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = quickPasteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4451BCAD2CA3EEBF00287BF7 /* quickPasteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = quickPasteUITests.swift; sourceTree = "<group>"; };
 		4451BCAF2CA3EEBF00287BF7 /* quickPasteUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = quickPasteUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		4451BCBD2CA3EF9E00287BF7 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		4451BCBF2CA3F37D00287BF7 /* ClipBoard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipBoard.swift; sourceTree = "<group>"; };
+		44775EE12CA4125E0065DCE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		44D6F67E1D65434CC98C4E13 /* Pods-quickPaste-quickPasteTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPaste-quickPasteTests.release.xcconfig"; path = "Target Support Files/Pods-quickPaste-quickPasteTests/Pods-quickPaste-quickPasteTests.release.xcconfig"; sourceTree = "<group>"; };
+		44DB88522CA5776C0022BCEC /* prefixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = prefixView.swift; sourceTree = "<group>"; };
+		44DB88552CA577E50022BCEC /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
+		453E34AAA91054E095A5332B /* Pods-quickPaste-quickPasteUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPaste-quickPasteUITests.debug.xcconfig"; path = "Target Support Files/Pods-quickPaste-quickPasteUITests/Pods-quickPaste-quickPasteUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		488C615F4182CEADC7A288AC /* Pods_quickPasteTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_quickPasteTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AFCCEACA259D47CEB27EFC3 /* Pods_quickPaste_quickPasteUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_quickPaste_quickPasteUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6695B7860D951C2E901384B3 /* Pods-quickPaste.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPaste.release.xcconfig"; path = "Target Support Files/Pods-quickPaste/Pods-quickPaste.release.xcconfig"; sourceTree = "<group>"; };
+		748B23F8724D8D66DEE8D6D0 /* Pods-quickPaste-quickPasteTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPaste-quickPasteTests.debug.xcconfig"; path = "Target Support Files/Pods-quickPaste-quickPasteTests/Pods-quickPaste-quickPasteTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B5911F156CE78175BE97E575 /* Pods-quickPasteTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPasteTests.debug.xcconfig"; path = "Target Support Files/Pods-quickPasteTests/Pods-quickPasteTests.debug.xcconfig"; sourceTree = "<group>"; };
+		C8E88097B119DB151DA421F6 /* Pods-quickPasteTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPasteTests.release.xcconfig"; path = "Target Support Files/Pods-quickPasteTests/Pods-quickPasteTests.release.xcconfig"; sourceTree = "<group>"; };
+		F793DD2BE3883D7A6E316060 /* Pods-quickPaste.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-quickPaste.debug.xcconfig"; path = "Target Support Files/Pods-quickPaste/Pods-quickPaste.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91F7343E94ECAE31CF54BF82 /* Pods_quickPaste.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DA35C1278C7272520362183 /* Pods_quickPasteTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,12 +93,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB597C8012B3C1614621F008 /* Pods_quickPaste_quickPasteUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		442D4B2F2CAA4D8B0050E437 /* values */ = {
+			isa = PBXGroup;
+			children = (
+				442D4B302CAA4DBD0050E437 /* CommonValues.swift */,
+			);
+			path = values;
+			sourceTree = "<group>";
+		};
 		4451BC852CA3EEBD00287BF7 = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +115,8 @@
 				4451BCA22CA3EEBF00287BF7 /* quickPasteTests */,
 				4451BCAC2CA3EEBF00287BF7 /* quickPasteUITests */,
 				4451BC8F2CA3EEBD00287BF7 /* Products */,
+				70DB22FA2714B962341A0967 /* Pods */,
+				F8102E29C1F189B2DF3D5B76 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,6 +133,11 @@
 		4451BC902CA3EEBD00287BF7 /* quickPaste */ = {
 			isa = PBXGroup;
 			children = (
+				442D4B2F2CAA4D8B0050E437 /* values */,
+				44DB88542CA577C60022BCEC /* tools */,
+				44DB88512CA5773E0022BCEC /* statusMenu */,
+				44775EE12CA4125E0065DCE2 /* Info.plist */,
+				4451BCBC2CA3EF7100287BF7 /* main */,
 				4451BC912CA3EEBD00287BF7 /* AppDelegate.swift */,
 				4451BC932CA3EEBD00287BF7 /* ViewController.swift */,
 				4451BC952CA3EEBE00287BF7 /* Assets.xcassets */,
@@ -121,6 +164,56 @@
 			path = quickPasteUITests;
 			sourceTree = "<group>";
 		};
+		4451BCBC2CA3EF7100287BF7 /* main */ = {
+			isa = PBXGroup;
+			children = (
+				4451BCBD2CA3EF9E00287BF7 /* MainViewController.swift */,
+				4451BCBF2CA3F37D00287BF7 /* ClipBoard.swift */,
+			);
+			path = main;
+			sourceTree = "<group>";
+		};
+		44DB88512CA5773E0022BCEC /* statusMenu */ = {
+			isa = PBXGroup;
+			children = (
+				44DB88522CA5776C0022BCEC /* prefixView.swift */,
+			);
+			path = statusMenu;
+			sourceTree = "<group>";
+		};
+		44DB88542CA577C60022BCEC /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				44DB88552CA577E50022BCEC /* Label.swift */,
+			);
+			path = tools;
+			sourceTree = "<group>";
+		};
+		70DB22FA2714B962341A0967 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F793DD2BE3883D7A6E316060 /* Pods-quickPaste.debug.xcconfig */,
+				6695B7860D951C2E901384B3 /* Pods-quickPaste.release.xcconfig */,
+				453E34AAA91054E095A5332B /* Pods-quickPaste-quickPasteUITests.debug.xcconfig */,
+				1B590D136FD0AB0C91FACBF6 /* Pods-quickPaste-quickPasteUITests.release.xcconfig */,
+				B5911F156CE78175BE97E575 /* Pods-quickPasteTests.debug.xcconfig */,
+				C8E88097B119DB151DA421F6 /* Pods-quickPasteTests.release.xcconfig */,
+				748B23F8724D8D66DEE8D6D0 /* Pods-quickPaste-quickPasteTests.debug.xcconfig */,
+				44D6F67E1D65434CC98C4E13 /* Pods-quickPaste-quickPasteTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		F8102E29C1F189B2DF3D5B76 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				219D79EE685C48AA9C73C936 /* Pods_quickPaste.framework */,
+				5AFCCEACA259D47CEB27EFC3 /* Pods_quickPaste_quickPasteUITests.framework */,
+				488C615F4182CEADC7A288AC /* Pods_quickPasteTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -128,9 +221,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4451BCB32CA3EEBF00287BF7 /* Build configuration list for PBXNativeTarget "quickPaste" */;
 			buildPhases = (
+				9733D177637F33971E45AA9A /* [CP] Check Pods Manifest.lock */,
 				4451BC8A2CA3EEBD00287BF7 /* Sources */,
 				4451BC8B2CA3EEBD00287BF7 /* Frameworks */,
 				4451BC8C2CA3EEBD00287BF7 /* Resources */,
+				74133F110BD97ED79EE860FC /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -145,6 +240,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4451BCB62CA3EEBF00287BF7 /* Build configuration list for PBXNativeTarget "quickPasteTests" */;
 			buildPhases = (
+				F70CE6A3973F67321103B0A9 /* [CP] Check Pods Manifest.lock */,
 				4451BC9B2CA3EEBF00287BF7 /* Sources */,
 				4451BC9C2CA3EEBF00287BF7 /* Frameworks */,
 				4451BC9D2CA3EEBF00287BF7 /* Resources */,
@@ -163,9 +259,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4451BCB92CA3EEBF00287BF7 /* Build configuration list for PBXNativeTarget "quickPasteUITests" */;
 			buildPhases = (
+				A7C41AD1C9C8C87D8DD3F7A7 /* [CP] Check Pods Manifest.lock */,
 				4451BCA52CA3EEBF00287BF7 /* Sources */,
 				4451BCA62CA3EEBF00287BF7 /* Frameworks */,
 				4451BCA72CA3EEBF00287BF7 /* Resources */,
+				2DE0DD567A008F571551B966 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -246,13 +344,121 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2DE0DD567A008F571551B966 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-quickPaste-quickPasteUITests/Pods-quickPaste-quickPasteUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-quickPaste-quickPasteUITests/Pods-quickPaste-quickPasteUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-quickPaste-quickPasteUITests/Pods-quickPaste-quickPasteUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		74133F110BD97ED79EE860FC /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-quickPaste/Pods-quickPaste-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-quickPaste/Pods-quickPaste-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-quickPaste/Pods-quickPaste-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9733D177637F33971E45AA9A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-quickPaste-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A7C41AD1C9C8C87D8DD3F7A7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-quickPaste-quickPasteUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F70CE6A3973F67321103B0A9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-quickPasteTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		4451BC8A2CA3EEBD00287BF7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4451BCBE2CA3EF9E00287BF7 /* MainViewController.swift in Sources */,
+				442D4B312CAA4DBD0050E437 /* CommonValues.swift in Sources */,
 				4451BC942CA3EEBD00287BF7 /* ViewController.swift in Sources */,
+				44DB88562CA577E50022BCEC /* Label.swift in Sources */,
+				4451BCC02CA3F37D00287BF7 /* ClipBoard.swift in Sources */,
 				4451BC922CA3EEBD00287BF7 /* AppDelegate.swift in Sources */,
+				44DB88532CA5776C0022BCEC /* prefixView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +626,7 @@
 		};
 		4451BCB42CA3EEBF00287BF7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F793DD2BE3883D7A6E316060 /* Pods-quickPaste.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -427,7 +634,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 575LXHRUTF;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = quickPaste/Info.plist;
+				INFOPLIST_KEY_LSBackgroundOnly = NO;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -445,6 +657,7 @@
 		};
 		4451BCB52CA3EEBF00287BF7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6695B7860D951C2E901384B3 /* Pods-quickPaste.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -452,7 +665,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 575LXHRUTF;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = quickPaste/Info.plist;
+				INFOPLIST_KEY_LSBackgroundOnly = NO;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -470,6 +688,7 @@
 		};
 		4451BCB72CA3EEBF00287BF7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B5911F156CE78175BE97E575 /* Pods-quickPasteTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -488,6 +707,7 @@
 		};
 		4451BCB82CA3EEBF00287BF7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C8E88097B119DB151DA421F6 /* Pods-quickPasteTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -506,6 +726,7 @@
 		};
 		4451BCBA2CA3EEBF00287BF7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 453E34AAA91054E095A5332B /* Pods-quickPaste-quickPasteUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -522,6 +743,7 @@
 		};
 		4451BCBB2CA3EEBF00287BF7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1B590D136FD0AB0C91FACBF6 /* Pods-quickPaste-quickPasteUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
